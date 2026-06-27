@@ -1,29 +1,22 @@
 package server;
-import admin.*;
+
 import java.net.*;
 import java.io.*;
 import log.Logger;
+import admin.*;
+import security.SecurityBootstrap;   // 假设您的安全模块入口类
 
 /**
  * 客户端处理器（每个客户端一个线程）
- * 负责：
- * - 接收客户端消息
- * - 处理登录认证
- * - 转发普通消息（群聊/私聊）
- * - 执行管理员命令（以 '/' 开头）
+ * 完整实现登录认证、消息转发、管理员命令处理。
  */
 public class ClientHandler extends Thread {
     private final Socket socket;
-    private final ChatServer server;   // 核心：持有服务器引用
+    private final ChatServer server;
     private DataInputStream dis;
     private DataOutputStream dos;
     private String username;           // 登录后的用户名
 
-    /**
-     * 构造器
-     * @param socket 客户端套接字
-     * @param server ChatServer 实例（用于调用广播、踢人等）
-     */
     public ClientHandler(Socket socket, ChatServer server) {
         this.socket = socket;
         this.server = server;
@@ -38,23 +31,28 @@ public class ClientHandler extends Thread {
     @Override
     public void run() {
         try {
-            // ---------- 登录流程 ----------
-            // 约定：客户端先发送用户名，再发送密码（均以 UTF 字符串传输）
+            // ---------- 登录流程（含安全验证） ----------
+            // 协议：客户端先发送用户名（UTF），再发送密码（UTF）
             String username = dis.readUTF();
             String password = dis.readUTF();
 
-            // 检查封禁
+            // 1. 检查封禁状态（即使未登录也可查，防止暴力破解）
             if (server.isBanned(username)) {
                 sendMessage("您的账号已被封禁，无法登录。");
                 closeConnection();
                 return;
             }
 
-            // 这里可以调用安全模块验证密码（当前示例简化，直接通过）
-            // 实际应使用 SecurityBootstrap 验证
-            // 假设验证通过：
+            // 2. 调用安全模块验证密码
+            boolean authSuccess = SecurityBootstrap.authenticate(username, password);
+            if (!authSuccess) {
+                sendMessage("用户名或密码错误。");
+                closeConnection();
+                return;
+            }
+
+            // 3. 验证通过，注册用户
             this.username = username;
-            // 注册到服务器在线列表
             server.addClient(username, this);
             sendMessage("登录成功！欢迎 " + username);
             server.broadcastToAll(username + " 加入了聊天室。");
@@ -78,7 +76,7 @@ public class ClientHandler extends Thread {
             }
         } catch (EOFException e) {
             // 客户端正常断开
-            Logger.getInstance().info(username + " 断开连接");
+            Logger.getInstance().info((username != null ? username : "未知用户") + " 断开连接");
         } catch (IOException e) {
             Logger.getInstance().error("ClientHandler error: " + e.getMessage());
         } finally {
@@ -93,7 +91,6 @@ public class ClientHandler extends Thread {
 
     /**
      * 发送消息给该客户端
-     * @param msg 消息内容
      */
     public void sendMessage(String msg) {
         if (dos != null) {

@@ -1,13 +1,13 @@
 package common;
 
+/**
+ * 通用消息对象，封装协议中的 TYPE|sender|receiver|content。
+ */
 public class Message {
-
-    private String type;       // LOGIN / PRIVATE / GROUP / FILE
-    private String sender;
-    private String receiver;
-    private String content;
-
-    public Message() {}
+    private final String type;
+    private final String sender;
+    private final String receiver;
+    private final String content;
 
     public Message(String type, String sender, String receiver, String content) {
         this.type = type;
@@ -16,71 +16,26 @@ public class Message {
         this.content = content;
     }
 
-    // ================= getters & setters =================
+    public String getType()     { return type; }
+    public String getSender()   { return sender; }
+    public String getReceiver() { return receiver; }
+    public String getContent()  { return content; }
 
-    public String getType() {
-        return type;
+    /**
+     * 将一行字符串解析为 Message 对象。
+     * 格式：TYPE|sender|receiver|content
+     */
+    public static Message decode(String line) {
+        if (line == null || line.isEmpty()) return null;
+        String[] parts = line.split("\\|", 4);
+        if (parts.length < 4) return null;
+        return new Message(parts[0], parts[1], parts[2], parts[3]);
     }
 
-    public void setType(String type) {
-        this.type = type;
-    }
-
-    public String getSender() {
-        return sender;
-    }
-
-    public void setSender(String sender) {
-        this.sender = sender;
-    }
-
-    public String getReceiver() {
-        return receiver;
-    }
-
-    public void setReceiver(String receiver) {
-        this.receiver = receiver;
-    }
-
-    public String getContent() {
-        return content;
-    }
-
-    public void setContent(String content) {
-        this.content = content;
-    }
-
-    // ================= encode =================
-    // Java对象 → 网络字符串
+    /**
+     * 将 Message 编码为传输字符串（带换行符，由调用方添加）。
+     */
     public String encode() {
         return type + "|" + sender + "|" + receiver + "|" + content;
-    }
-
-    // ================= decode =================
-    // 网络字符串 → Java对象
-    public static Message decode(String msg) {
-        if (msg == null || msg.isEmpty()) {
-            return null;
-        }
-
-        String[] parts = msg.split("\\|", -1);
-
-        // 防止越界
-        String type = parts.length > 0 ? parts[0] : "";
-        String sender = parts.length > 1 ? parts[1] : "";
-        String receiver = parts.length > 2 ? parts[2] : "";
-        String content = parts.length > 3 ? parts[3] : "";
-
-        return new Message(type, sender, receiver, content);
-    }
-
-    @Override
-    public String toString() {
-        return "Message{" +
-                "type='" + type + '\'' +
-                ", sender='" + sender + '\'' +
-                ", receiver='" + receiver + '\'' +
-                ", content='" + content + '\'' +
-                '}';
     }
 }

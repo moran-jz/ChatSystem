@@ -1,27 +1,17 @@
 package common;
 
-public class Protocol {
+/**
+ * 协议常量定义，与 README 中的通信格式保持一致。
+ */
+public final class Protocol {
+    private Protocol() {}
 
-    // ====== Message Type ======
-    public static final String LOGIN = "LOGIN";
+    // 消息类型
+    public static final String LOGIN    = "LOGIN";
     public static final String REGISTER = "REGISTER";
-
-    public static final String PRIVATE = "PRIVATE";
-    public static final String GROUP = "GROUP";
-
-    public static final String FILE = "FILE";
-
-    public static final String LOGOUT = "LOGOUT";
-
-    public static final String ONLINE = "ONLINE";
-
-    // ====== Special receiver ======
-    public static final String ALL = "ALL";
-
-    // ====== Separator ======
-    public static final String SEP = "\\|";
-
-    // ====== System response ======
-    public static final String SUCCESS = "SUCCESS";
-    public static final String FAIL = "FAIL";
+    public static final String LOGOUT   = "LOGOUT";
+    public static final String PRIVATE  = "PRIVATE";
+    public static final String BROADCAST = "BROADCAST";
+    public static final String SUCCESS  = "SUCCESS";
+    public static final String FAIL     = "FAIL";
 }
