@@ -1,6 +1,8 @@
 package client;
 import javax.swing.SwingUtilities;
 import java.net.Socket;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 
 public class ChatClient {
 
@@ -23,7 +25,8 @@ public class ChatClient {
             });
 
             // 3. 启动消息接收线程
-            new Thread(() -> listenServer()).start();
+            ExecutorService pool=Executors.newFixedThreadPool(10);
+            pool.execute(() -> listenServer());
 
         } catch (Exception e) {
             e.printStackTrace();
