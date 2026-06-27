@@ -1,0 +1,9 @@
+[2026-06-27 15:24:20.327] [INFO] ExtensionManager initialization started...
+[2026-06-27 15:24:20.331] [ERROR] ChatServer instance is null. Please ensure ChatServer is initialized before calling ExtensionManager.init()
+[2026-06-27 15:30:30.768] [INFO] ExtensionManager initialization started...
+[2026-06-27 15:30:30.864] [INFO] File HTTP Server started on port 8080
+[2026-06-27 15:30:30.865] [INFO] FileHttpServer started on port 8080
+[2026-06-27 15:30:30.866] [INFO] UDPBroadcastServer started on port 9999
+[2026-06-27 15:30:30.867] [INFO] AdminCommandHandler initialized
+[2026-06-27 15:30:30.868] [INFO] ExtensionManager initialization completed.
+[2026-06-27 15:30:30.871] [INFO] UDP Broadcast Server started on port 9999

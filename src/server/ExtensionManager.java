@@ -1,8 +1,85 @@
 package server;
 
-public class ExtensionManager {
-    public static void init() {
-        // 占位：初始化扩展模块（udp/admin/log/file），不实现具体逻辑
-    }
-}
+import java.io.IOException;
+import file.*;
+import udp.*;
+import admin.*;
+import log.Logger;
 
+
+public class ExtensionManager {
+
+    private static FileHttpServer fileHttpServer;
+    private static Thread udpBroadcastThread;
+    private static UDPBroadcastServer udpBroadcastServer;
+    private static AdminCommandHandler adminCommandHandler;
+
+    /**
+     * 无参初始化方法
+     * 内部通过 ChatServer.getInstance() 获取服务器实例
+     */
+    public static void init() {
+        Logger logger = Logger.getInstance();
+        logger.info("ExtensionManager initialization started...");
+
+        // 获取 ChatServer 单例
+        ChatServer chatServer = ChatServer.getInstance();
+        if (chatServer == null) {
+            logger.error("ChatServer instance is null. Please ensure ChatServer is initialized before calling ExtensionManager.init()");
+            return;
+        }
+
+        try {
+            // 1. 启动 HTTP 文件服务器
+            fileHttpServer = new FileHttpServer();
+            fileHttpServer.start();
+            logger.info("FileHttpServer started on port 8080");
+        } catch (IOException e) {
+            logger.error("Failed to start FileHttpServer: " + e.getMessage());
+        }
+
+        try {
+            // 2. 启动 UDP 广播服务器
+            udpBroadcastServer = new UDPBroadcastServer(chatServer);
+            udpBroadcastThread = new Thread(udpBroadcastServer, "UDP-Broadcast-Thread");
+            udpBroadcastThread.start();
+            logger.info("UDPBroadcastServer started on port 9999");
+        } catch (Exception e) {
+            logger.error("Failed to start UDPBroadcastServer: " + e.getMessage());
+        }
+
+        try {
+            // 3. 初始化管理员命令处理器
+            adminCommandHandler = new AdminCommandHandler(chatServer);
+            logger.info("AdminCommandHandler initialized");
+        } catch (Exception e) {
+            logger.error("Failed to initialize AdminCommandHandler: " + e.getMessage());
+        }
+
+        logger.info("ExtensionManager initialization completed.");
+    }
+
+    public static void shutdown() {
+        Logger logger = Logger.getInstance();
+        logger.info("ExtensionManager shutting down...");
+
+        if (udpBroadcastServer != null) {
+            udpBroadcastServer.stop();
+        }
+        if (fileHttpServer != null) {
+            fileHttpServer.stop();
+        }
+        if (udpBroadcastThread != null && udpBroadcastThread.isAlive()) {
+            try {
+                udpBroadcastThread.join(2000);
+            } catch (InterruptedException e) {
+                Thread.currentThread().interrupt();
+            }
+        }
+        logger.info("ExtensionManager shutdown complete.");
+    }
+
+    public static AdminCommandHandler getAdminCommandHandler() {
+        return adminCommandHandler;
+    }
+};
