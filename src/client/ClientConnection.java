@@ -4,26 +4,43 @@ import java.io.*;
 import java.net.Socket;
 
 public class ClientConnection {
-
     private Socket socket;
-    private BufferedReader in;
-    private PrintWriter out;
+    private DataInputStream dis;
+    private DataOutputStream dos;
+    private volatile boolean connected = true;
 
     public ClientConnection(Socket socket) throws IOException {
         this.socket = socket;
-        this.in = new BufferedReader(new InputStreamReader(socket.getInputStream()));
-        this.out = new PrintWriter(socket.getOutputStream(), true);
+        this.dis = new DataInputStream(socket.getInputStream());
+        this.dos = new DataOutputStream(socket.getOutputStream());
     }
 
-    public void send(String msg) {
-        out.println(msg);
+    // 发送消息（线程安全）
+    public synchronized void send(String msg) throws IOException {
+        if (!connected) throw new IOException("连接已关闭");
+        dos.writeUTF(msg);
+        dos.flush();
     }
 
+    // 接收消息（阻塞）
     public String receive() throws IOException {
-        return in.readLine();
+        if (!connected) throw new IOException("连接已关闭");
+        return dis.readUTF();
     }
 
-    public void close() throws IOException {
-        socket.close();
+    // 关闭连接
+    public synchronized void close() {
+        connected = false;
+        try {
+            if (dis != null) dis.close();
+            if (dos != null) dos.close();
+            if (socket != null) socket.close();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
+    public boolean isConnected() {
+        return connected;
     }
 }

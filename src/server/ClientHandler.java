@@ -4,11 +4,12 @@ import java.net.*;
 import java.io.*;
 import log.Logger;
 import admin.*;
-import security.SecurityBootstrap;   // 假设您的安全模块入口类
+import security.*;
 
 /**
  * 客户端处理器（每个客户端一个线程）
- * 完整实现登录认证、消息转发、管理员命令处理。
+ * 完整实现登录认证、注册、消息转发、管理员命令处理。
+ * 注册成功后不会自动登录，需用户重新登录。
  */
 public class ClientHandler extends Thread {
     private final Socket socket;
@@ -31,36 +32,66 @@ public class ClientHandler extends Thread {
     @Override
     public void run() {
         try {
-            // ---------- 登录流程（含安全验证） ----------
-            // 协议：客户端先发送用户名（UTF），再发送密码（UTF）
+            // 1. 读取操作类型
+            String operation = dis.readUTF();  // "LOGIN" 或 "REGISTER"
             String username = dis.readUTF();
             String password = dis.readUTF();
 
-            // 1. 检查封禁状态（即使未登录也可查，防止暴力破解）
+            // 检查封禁（登录和注册都检查）
             if (server.isBanned(username)) {
-                sendMessage("您的账号已被封禁，无法登录。");
+                sendMessage("您的账号已被封禁，无法操作。");
                 closeConnection();
                 return;
             }
 
-            // 2. 调用安全模块验证密码
-            boolean authSuccess = SecurityBootstrap.authenticate(username, password);
-            if (!authSuccess) {
-                sendMessage("用户名或密码错误。");
+            // ---------- 处理注册（不自动登录，等待客户端主动断开） ----------
+            if ("REGISTER".equals(operation)) {
+                AuthResult result = UserManager.getInstance().register(username, password);
+                if (result.isSuccess()) {
+                    sendMessage("注册成功，请重新登录。");
+                } else {
+                    sendMessage("注册失败：" + result.getMessage());
+                }
+                // 关闭输出流，表示不会再发送数据
+                socket.shutdownOutput();
+                // 等待客户端主动关闭连接（这样客户端不会收到 reset）
+                try {
+                    while (dis.read() != -1) {
+                        // 忽略客户端可能发送的数据，直到客户端关闭
+                    }
+                } catch (IOException e) {
+                    // 客户端断开，正常
+                }
+                // 注册完成后，线程结束，finally 会关闭资源
+                return;
+            }
+
+            // ---------- 处理登录 ----------
+            if ("LOGIN".equals(operation)) {
+                boolean success = SecurityBootstrap.authenticate(username, password);
+                if (success) {
+                    sendMessage("登录成功！");
+                } else {
+                    sendMessage("用户名或密码错误。");
+                    closeConnection();
+                    return;
+                }
+            } else {
+                sendMessage("未知操作类型。");
                 closeConnection();
                 return;
             }
 
-            // 3. 验证通过，注册用户
+            // 登录成功后注册到在线列表
             this.username = username;
             server.addClient(username, this);
-            sendMessage("登录成功！欢迎 " + username);
+            sendMessage("欢迎 " + username);
             server.broadcastToAll(username + " 加入了聊天室。");
 
             // ---------- 主消息循环 ----------
             String message;
             while ((message = dis.readUTF()) != null) {
-                // 处理管理员命令（以 '/' 开头）
+                // 处理管理员命令
                 if (message.startsWith("/")) {
                     AdminCommandHandler adminHandler = ExtensionManager.getAdminCommandHandler();
                     if (adminHandler != null) {
@@ -70,7 +101,6 @@ public class ClientHandler extends Thread {
                         sendMessage("管理员命令处理器未初始化。");
                     }
                 } else {
-                    // 普通消息：广播给所有人（可扩展私聊逻辑）
                     server.broadcastToAll(username + ": " + message);
                 }
             }
