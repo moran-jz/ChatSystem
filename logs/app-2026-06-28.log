@@ -207,3 +207,37 @@
 [2026-06-28 13:52:48.368] [INFO] admin 断开连接
 [2026-06-28 13:52:48.370] [INFO] User admin disconnected.
 [2026-06-28 13:52:48.370] [INFO] 广播: admin 离开了聊天室。
+[2026-06-28 15:14:35.453] [INFO] ExtensionManager initialization started...
+[2026-06-28 15:14:35.546] [INFO] File HTTP Server started on port 8080
+[2026-06-28 15:14:35.547] [INFO] FileHttpServer started on port 8080
+[2026-06-28 15:14:35.548] [INFO] UDPBroadcastServer started on port 9999
+[2026-06-28 15:14:35.549] [INFO] AdminCommandHandler initialized
+[2026-06-28 15:14:35.549] [INFO] ExtensionManager initialization completed.
+[2026-06-28 15:14:35.550] [INFO] Chat Server started on port 9000
+[2026-06-28 15:14:35.551] [INFO] UDP Broadcast Server started on port 9999
+[2026-06-28 15:14:45.262] [INFO] /127.0.0.1:57600 connect.
+[2026-06-28 15:14:56.855] [INFO] User SZM logged in.
+[2026-06-28 15:14:56.860] [INFO] 广播: SZM 加入了聊天室。
+[2026-06-28 15:15:07.384] [INFO] /127.0.0.1:54502 connect.
+[2026-06-28 15:15:09.206] [INFO] User admin logged in.
+[2026-06-28 15:15:09.210] [INFO] 广播: admin 加入了聊天室。
+[2026-06-28 15:15:14.060] [INFO] /127.0.0.1:54513 connect.
+[2026-06-28 15:15:22.205] [INFO] User CJG logged in.
+[2026-06-28 15:15:22.208] [INFO] 广播: CJG 加入了聊天室。
+[2026-06-28 15:15:36.736] [INFO] 私聊: CJG -> SZM: /kick
+[2026-06-28 15:15:46.612] [INFO] 私聊: CJG -> SZM: 你好我是cjg
+[2026-06-28 15:15:57.932] [INFO] 私聊: CJG -> SZM: 你好这里是szm
+[2026-06-28 15:17:27.763] [INFO] File downloaded: 流程图.txt
+[2026-06-28 15:17:27.776] [INFO] Download successful: 流程图.txt saved to ./downloads/
+[2026-06-28 15:17:49.251] [INFO] 服务器正在关闭...
+[2026-06-28 15:17:49.256] [INFO] 服务器已关闭。
+[2026-06-28 15:17:49.257] [ERROR] ClientHandler error: Socket closed
+[2026-06-28 15:17:49.257] [ERROR] ClientHandler error: Socket closed
+[2026-06-28 15:17:49.260] [INFO] User CJG disconnected.
+[2026-06-28 15:17:49.259] [ERROR] Failed to send message to admin: Socket closed
+[2026-06-28 15:17:49.260] [INFO] User SZM disconnected.
+[2026-06-28 15:17:49.263] [ERROR] ClientHandler error: Socket closed
+[2026-06-28 15:17:49.263] [INFO] 广播: SZM 离开了聊天室。
+[2026-06-28 15:17:49.263] [INFO] 广播: CJG 离开了聊天室。
+[2026-06-28 15:17:49.264] [INFO] User admin disconnected.
+[2026-06-28 15:17:49.267] [INFO] 广播: admin 离开了聊天室。
