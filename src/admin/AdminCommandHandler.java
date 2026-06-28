@@ -1,38 +1,49 @@
 package admin;
-import java.util.List;
+
 import server.ChatServer;
+import java.util.List;
+import java.util.Set;
+import java.util.HashSet;
 
 /**
- * 管理员命令处理器，解析以 '/' 开头的命令并执行相应操作。
- * 需要 ChatServer 提供以下方法：
- *   - broadcastToAll(String message)
- *   - kickUser(String username)
- *   - banUser(String username)
- *   - unbanUser(String username)
- *   - getOnlineUsers() 返回 List<String>
- *   - shutdown() 关闭服务器（可选）
+ * 管理员命令处理器（带权限校验）
  */
 public class AdminCommandHandler {
-
     private final ChatServer chatServer;
+    private final Set<String> admins = new HashSet<>();
 
     public AdminCommandHandler(ChatServer chatServer) {
         this.chatServer = chatServer;
+        // 硬编码管理员账号（可根据需要改为从文件加载）
+        admins.add("admin");
+        // 可添加更多管理员
+        // admins.add("root");
     }
 
     /**
-     * 处理一条命令消息（原始字符串）
-     * @param fullMessage 例如 "/kick Tom" 或 "/broadcast Hello everyone"
-     * @return 执行结果的描述（可用于回复给命令发起者）
+     * 处理命令，并校验权限
+     * @param fullMessage 原始消息（如 "/kick tom"）
+     * @param sender      命令发起者的用户名
+     * @return 执行结果字符串（直接回复给发起者）
      */
-    public String handleCommand(String fullMessage) {
+    public String handleCommand(String fullMessage, String sender) {
         if (fullMessage == null || !fullMessage.startsWith("/")) {
-            return "Not a command.";
+            return "不是有效命令。";
         }
 
         String[] parts = fullMessage.split("\\s+", 2);
         String command = parts[0].toLowerCase();
         String arg = parts.length > 1 ? parts[1] : "";
+
+        // /help 命令不受权限限制
+        if ("/help".equals(command)) {
+            return getHelp();
+        }
+
+        // 权限校验
+        if (!admins.contains(sender)) {
+            return "权限不足，只有管理员可以执行此命令。";
+        }
 
         switch (command) {
             case "/kick":
@@ -48,67 +59,63 @@ public class AdminCommandHandler {
             case "/shutdown":
                 return shutdownServer();
             default:
-                return "Unknown command: " + command;
+                return "未知命令，输入 /help 查看帮助。";
         }
     }
 
+    // -------------------- 具体命令实现 --------------------
+
     private String kickUser(String username) {
-        if (username.isEmpty()) {
-            return "Usage: /kick <username>";
-        }
+        if (username.isEmpty()) return "用法: /kick <用户名>";
         boolean result = chatServer.kickUser(username);
         if (result) {
-            chatServer.broadcastToAll("User " + username + " has been kicked by admin.");
-            return "User " + username + " kicked.";
-        } else {
-            return "Failed to kick " + username + ". User may not exist.";
+            chatServer.broadcastToAll("用户 " + username + " 已被管理员踢出。");
+            return "用户 " + username + " 已踢出。";
         }
+        return "踢出失败，用户可能不在线或不存在。";
     }
 
     private String banUser(String username) {
-        if (username.isEmpty()) {
-            return "Usage: /ban <username>";
-        }
+        if (username.isEmpty()) return "用法: /ban <用户名>";
         boolean result = chatServer.banUser(username);
         if (result) {
-            chatServer.broadcastToAll("User " + username + " has been banned by admin.");
-            return "User " + username + " banned.";
-        } else {
-            return "Failed to ban " + username + ".";
+            chatServer.broadcastToAll("用户 " + username + " 已被管理员封禁。");
+            return "用户 " + username + " 已封禁。";
         }
+        return "封禁失败（用户可能已封禁或不存在）。";
     }
 
     private String unbanUser(String username) {
-        if (username.isEmpty()) {
-            return "Usage: /unban <username>";
-        }
+        if (username.isEmpty()) return "用法: /unban <用户名>";
         boolean result = chatServer.unbanUser(username);
-        if (result) {
-            return "User " + username + " unbanned.";
-        } else {
-            return "Failed to unban " + username + ".";
-        }
+        return result ? "用户 " + username + " 已解封。" : "解封失败，用户不在封禁列表中。";
     }
 
     private String listUsers() {
         List<String> users = chatServer.getOnlineUsers();
-        if (users.isEmpty()) {
-            return "No online users.";
-        }
-        return "Online users: " + String.join(", ", users);
+        if (users.isEmpty()) return "当前没有在线用户。";
+        return "在线用户: " + String.join(", ", users);
     }
 
-    private String broadcastMessage(String message) {
-        if (message.isEmpty()) {
-            return "Usage: /broadcast <message>";
-        }
-        chatServer.broadcastToAll("[Admin] " + message);
-        return "Broadcast sent.";
+    private String broadcastMessage(String msg) {
+        if (msg.isEmpty()) return "用法: /broadcast <消息内容>";
+        chatServer.broadcastToAll("[管理员广播] " + msg);
+        return "广播已发送。";
     }
 
     private String shutdownServer() {
-        // 可选，需 ChatServer 提供 shutdown() 方法
-        // chatServer.shutdown();
-        return "Server shutdown not implemented in this handler.";
+        chatServer.shutdown();
+        return "服务器正在关闭...";
+    }
+
+    private String getHelp() {
+        return "可用命令:\n" +
+                "/kick <用户名>  - 踢出用户\n" +
+                "/ban <用户名>   - 封禁用户\n" +
+                "/unban <用户名> - 解封用户\n" +
+                "/list          - 查看在线用户\n" +
+                "/broadcast <消息> - 发送系统广播\n" +
+                "/shutdown      - 关闭服务器\n" +
+                "/help          - 显示本帮助";
     }
 }

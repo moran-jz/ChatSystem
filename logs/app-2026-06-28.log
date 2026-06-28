@@ -92,3 +92,97 @@
 [2026-06-28 12:33:41.026] [INFO] admin 断开连接
 [2026-06-28 12:33:41.027] [INFO] User admin disconnected.
 [2026-06-28 12:33:41.028] [INFO] 广播: admin 离开了聊天室。
+[2026-06-28 12:34:47.182] [INFO] ExtensionManager initialization started...
+[2026-06-28 12:34:47.270] [INFO] File HTTP Server started on port 8080
+[2026-06-28 12:34:47.270] [INFO] FileHttpServer started on port 8080
+[2026-06-28 12:34:47.271] [INFO] UDPBroadcastServer started on port 9999
+[2026-06-28 12:34:47.272] [INFO] AdminCommandHandler initialized
+[2026-06-28 12:34:47.272] [INFO] ExtensionManager initialization completed.
+[2026-06-28 12:34:47.273] [INFO] Chat Server started on port 9000
+[2026-06-28 12:34:47.273] [INFO] UDP Broadcast Server started on port 9999
+[2026-06-28 12:35:01.167] [INFO] /127.0.0.1:55230 connect.
+[2026-06-28 12:35:51.859] [INFO] ExtensionManager initialization started...
+[2026-06-28 12:35:51.952] [INFO] File HTTP Server started on port 8080
+[2026-06-28 12:35:51.953] [INFO] FileHttpServer started on port 8080
+[2026-06-28 12:35:51.954] [INFO] UDPBroadcastServer started on port 9999
+[2026-06-28 12:35:51.955] [INFO] AdminCommandHandler initialized
+[2026-06-28 12:35:51.955] [INFO] ExtensionManager initialization completed.
+[2026-06-28 12:35:51.956] [INFO] Chat Server started on port 9000
+[2026-06-28 12:35:51.957] [INFO] UDP Broadcast Server started on port 9999
+[2026-06-28 12:35:56.683] [INFO] /127.0.0.1:52921 connect.
+[2026-06-28 12:36:04.829] [INFO] User SZM logged in.
+[2026-06-28 12:36:04.833] [INFO] 广播: SZM 加入了聊天室。
+[2026-06-28 12:36:24.901] [INFO] 广播: SZM: 大家好，我是SZM！
+[2026-06-28 12:36:30.441] [INFO] /127.0.0.1:53070 connect.
+[2026-06-28 12:36:34.675] [INFO] User admin logged in.
+[2026-06-28 12:36:34.679] [INFO] 广播: admin 加入了聊天室。
+[2026-06-28 12:36:40.609] [INFO] 广播: admin: 我是管理员
+[2026-06-28 12:36:46.926] [INFO] /127.0.0.1:53129 connect.
+[2026-06-28 12:36:55.664] [INFO] User TEST logged in.
+[2026-06-28 12:36:55.668] [INFO] 广播: TEST 加入了聊天室。
+[2026-06-28 12:37:02.600] [INFO] 广播: TEST: 我是人机，我来捣乱！
+[2026-06-28 12:37:27.441] [INFO] 广播: TEST: 嗨嗨嗨
+[2026-06-28 12:37:40.706] [INFO] 广播: TEST: 我来传个文件！
+[2026-06-28 12:38:32.750] [INFO] File uploaded: 新建+文本文档.txt
+[2026-06-28 12:38:32.766] [INFO] Upload successful: 新建 文本文档.txt
+[2026-06-28 12:38:32.769] [INFO] 广播: TEST: [文件] TEST 上传了文件: 新建 文本文档.txt
+[2026-06-28 12:38:48.489] [INFO] 广播: SZM: 我很好奇，想下下来看看
+[2026-06-28 12:39:06.051] [ERROR] Download failed, HTTP code: 404
+[2026-06-28 12:39:26.304] [INFO] File downloaded: 新建+文本文档.txt
+[2026-06-28 12:39:26.306] [INFO] Download successful: 新建 文本文档.txt saved to ./downloads/
+[2026-06-28 12:40:07.952] [INFO] File downloaded: file1.dat
+[2026-06-28 12:40:07.953] [INFO] Download successful: file1.dat saved to ./downloads/
+[2026-06-28 12:40:28.306] [INFO] 广播: admin: 人机滚😡
+[2026-06-28 12:40:35.458] [INFO] 用户 TEST 被管理员踢出。
+[2026-06-28 12:40:35.459] [ERROR] ClientHandler error: Socket closed
+[2026-06-28 12:40:35.462] [INFO] 广播: TEST 被管理员踢出。
+[2026-06-28 12:40:35.463] [INFO] User TEST disconnected.
+[2026-06-28 12:40:35.465] [INFO] 广播: TEST 离开了聊天室。
+[2026-06-28 12:40:35.465] [INFO] 广播: User TEST has been kicked by admin.
+[2026-06-28 12:40:57.171] [INFO] /127.0.0.1:57023 connect.
+[2026-06-28 12:41:03.875] [INFO] User TEST logged in.
+[2026-06-28 12:41:03.879] [INFO] 广播: TEST 加入了聊天室。
+[2026-06-28 12:41:12.351] [INFO] 广播: TEST: 诶，我回来了
+[2026-06-28 12:41:16.566] [INFO] 广播: TEST: 气不气
+[2026-06-28 12:41:30.617] [INFO] 广播: admin: 滚
+[2026-06-28 12:41:37.546] [INFO] 用户 TEST 被封禁。
+[2026-06-28 12:41:37.546] [ERROR] ClientHandler error: Socket closed
+[2026-06-28 12:41:37.548] [INFO] User TEST disconnected.
+[2026-06-28 12:41:37.548] [INFO] 广播: TEST 已被管理员封禁。
+[2026-06-28 12:41:37.552] [INFO] 广播: TEST 离开了聊天室。
+[2026-06-28 12:41:37.553] [INFO] 广播: User TEST has been banned by admin.
+[2026-06-28 12:41:49.082] [INFO] /127.0.0.1:57117 connect.
+[2026-06-28 12:42:41.826] [INFO] 用户 TEST 已解封。
+[2026-06-28 12:42:51.548] [INFO] /127.0.0.1:57194 connect.
+[2026-06-28 12:42:57.819] [INFO] User TEST logged in.
+[2026-06-28 12:42:57.823] [INFO] 广播: TEST 加入了聊天室。
+[2026-06-28 12:43:01.425] [INFO] 广播: TEST: 我错了
+[2026-06-28 12:43:47.945] [INFO] 用户 TEST 被封禁。
+[2026-06-28 12:43:47.945] [ERROR] ClientHandler error: Socket closed
+[2026-06-28 12:43:47.948] [INFO] User TEST disconnected.
+[2026-06-28 12:43:47.948] [INFO] 广播: TEST 已被管理员封禁。
+[2026-06-28 12:43:47.951] [INFO] 广播: TEST 离开了聊天室。
+[2026-06-28 12:43:47.951] [INFO] 广播: User TEST has been banned by admin.
+[2026-06-28 12:44:10.570] [INFO] SZM 断开连接
+[2026-06-28 12:44:10.573] [INFO] User SZM disconnected.
+[2026-06-28 12:44:10.576] [INFO] 广播: SZM 离开了聊天室。
+[2026-06-28 12:48:28.076] [INFO] ExtensionManager initialization started...
+[2026-06-28 12:48:28.161] [INFO] File HTTP Server started on port 8080
+[2026-06-28 12:48:28.162] [INFO] FileHttpServer started on port 8080
+[2026-06-28 12:48:28.163] [INFO] UDPBroadcastServer started on port 9999
+[2026-06-28 12:48:28.163] [INFO] AdminCommandHandler initialized
+[2026-06-28 12:48:28.165] [INFO] ExtensionManager initialization completed.
+[2026-06-28 12:48:28.166] [INFO] Chat Server started on port 9000
+[2026-06-28 12:48:28.166] [INFO] UDP Broadcast Server started on port 9999
+[2026-06-28 12:48:48.291] [INFO] /127.0.0.1:50460 connect.
+[2026-06-28 12:48:56.479] [INFO] User CJG logged in.
+[2026-06-28 12:48:56.483] [INFO] 广播: CJG 加入了聊天室。
+[2026-06-28 12:49:00.599] [INFO] /127.0.0.1:50484 connect.
+[2026-06-28 12:49:08.532] [INFO] User TEST logged in.
+[2026-06-28 12:49:08.535] [INFO] 广播: TEST 加入了聊天室。
+[2026-06-28 12:49:52.548] [INFO] CJG 断开连接
+[2026-06-28 12:49:52.551] [INFO] User CJG disconnected.
+[2026-06-28 12:49:52.555] [INFO] 广播: CJG 离开了聊天室。
+[2026-06-28 12:49:55.012] [INFO] TEST 断开连接
+[2026-06-28 12:49:55.014] [INFO] User TEST disconnected.
+[2026-06-28 12:49:55.015] [INFO] 广播: TEST 离开了聊天室。

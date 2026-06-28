@@ -44,7 +44,7 @@ public class ClientHandler extends Thread {
                 return;
             }
 
-            // ---------- 处理注册（不自动登录，等待客户端主动断开） ----------
+            // ---------- 处理注册（不自动登录） ----------
             if ("REGISTER".equals(operation)) {
                 AuthResult result = UserManager.getInstance().register(username, password);
                 if (result.isSuccess()) {
@@ -54,7 +54,7 @@ public class ClientHandler extends Thread {
                 }
                 // 关闭输出流，表示不会再发送数据
                 socket.shutdownOutput();
-                // 等待客户端主动关闭连接（这样客户端不会收到 reset）
+                // 等待客户端主动关闭连接
                 try {
                     while (dis.read() != -1) {
                         // 忽略客户端可能发送的数据，直到客户端关闭
@@ -91,11 +91,11 @@ public class ClientHandler extends Thread {
             // ---------- 主消息循环 ----------
             String message;
             while ((message = dis.readUTF()) != null) {
-                // 处理管理员命令
+                // 处理管理员命令（传入当前用户名，用于权限校验）
                 if (message.startsWith("/")) {
                     AdminCommandHandler adminHandler = ExtensionManager.getAdminCommandHandler();
                     if (adminHandler != null) {
-                        String response = adminHandler.handleCommand(message);
+                        String response = adminHandler.handleCommand(message, username);
                         sendMessage(response);
                     } else {
                         sendMessage("管理员命令处理器未初始化。");
