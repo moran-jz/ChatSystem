@@ -186,3 +186,24 @@
 [2026-06-28 12:49:55.012] [INFO] TEST 断开连接
 [2026-06-28 12:49:55.014] [INFO] User TEST disconnected.
 [2026-06-28 12:49:55.015] [INFO] 广播: TEST 离开了聊天室。
+[2026-06-28 13:49:53.249] [INFO] ExtensionManager initialization started...
+[2026-06-28 13:49:53.352] [INFO] File HTTP Server started on port 8080
+[2026-06-28 13:49:53.353] [INFO] FileHttpServer started on port 8080
+[2026-06-28 13:49:53.353] [INFO] UDPBroadcastServer started on port 9999
+[2026-06-28 13:49:53.355] [INFO] AdminCommandHandler initialized
+[2026-06-28 13:49:53.355] [INFO] ExtensionManager initialization completed.
+[2026-06-28 13:49:53.356] [INFO] Chat Server started on port 9000
+[2026-06-28 13:49:53.359] [INFO] UDP Broadcast Server started on port 9999
+[2026-06-28 13:50:03.922] [INFO] /127.0.0.1:54264 connect.
+[2026-06-28 13:50:10.178] [INFO] User admin logged in.
+[2026-06-28 13:50:10.179] [INFO] 广播: admin 加入了聊天室。
+[2026-06-28 13:50:24.468] [INFO] /127.0.0.1:49672 connect.
+[2026-06-28 13:50:34.961] [INFO] User SZM logged in.
+[2026-06-28 13:50:34.962] [INFO] 广播: SZM 加入了聊天室。
+[2026-06-28 13:50:48.763] [INFO] 私聊: admin -> SZM: 你好 我是管理员
+[2026-06-28 13:52:47.625] [INFO] SZM 断开连接
+[2026-06-28 13:52:47.626] [INFO] User SZM disconnected.
+[2026-06-28 13:52:47.626] [INFO] 广播: SZM 离开了聊天室。
+[2026-06-28 13:52:48.368] [INFO] admin 断开连接
+[2026-06-28 13:52:48.370] [INFO] User admin disconnected.
+[2026-06-28 13:52:48.370] [INFO] 广播: admin 离开了聊天室。

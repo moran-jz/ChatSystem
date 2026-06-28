@@ -1,18 +1,27 @@
 package server;
 
-import java.util.*;
-import java.net.*;
-import java.io.*;
+import common.Message;
+import common.Protocol;
 import log.Logger;
-import java.util.concurrent.*;
 import security.SecurityBootstrap;
+
+import java.io.IOException;
+import java.net.ServerSocket;
+import java.net.Socket;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.CopyOnWriteArrayList;
 
 public class ChatServer {
     private static ChatServer instance;
     private final int port;
     private ServerSocket serverSocket;
     private volatile boolean running;
-    // 线程安全的在线用户映射
     private final Map<String, ClientHandler> onlineClients = new ConcurrentHashMap<>();
     private final Set<String> bannedUsers = Collections.synchronizedSet(new HashSet<>());
     private final List<String> messageHistory = new CopyOnWriteArrayList<>();
@@ -31,41 +40,28 @@ public class ChatServer {
             instance = new ChatServer(port);
         }
     }
+
     public static void main(String[] args) {
         try {
-            // 1. 初始化安全模块（B）
             SecurityBootstrap.init();
-
-            // 2. 创建 ChatServer 实例（单例）
             ChatServer.createInstance(9000);
-            // 无需再调用 setChatServer，因为 ExtensionManager.init() 内部会通过 getInstance() 获取
-
-            // 3. 初始化扩展模块（D）
             ExtensionManager.init();
-
-            // 4. 启动服务器核心
             ChatServer.getInstance().start();
-
         } catch (Exception e) {
             e.printStackTrace();
         }
     }
 
-    /**
-     * 实例方法：启动服务器循环
-     */
     public void start() throws IOException {
         this.running = true;
-        // 使用 try-with-resources 管理 ServerSocket
         try (ServerSocket serverSocket = new ServerSocket(port)) {
-            this.serverSocket = serverSocket;   // 保留引用供 shutdown 使用
+            this.serverSocket = serverSocket;
             Logger.getInstance().info("Chat Server started on port " + port);
 
             while (running) {
                 Socket clientSocket = serverSocket.accept();
                 Logger.getInstance().info(clientSocket.getRemoteSocketAddress() + " connect.");
 
-                // 传入 this 引用，让 ClientHandler 能调用广播等方法
                 ClientHandler handler = new ClientHandler(clientSocket, this);
                 handler.start();
             }
@@ -74,12 +70,10 @@ public class ChatServer {
                 throw e;
             }
         } finally {
-            // 确保关闭所有客户端连接
             shutdown();
         }
     }
 
-    // ---------- 客户端管理辅助方法 ----------
     public void addClient(String username, ClientHandler handler) {
         onlineClients.put(username, handler);
         Logger.getInstance().info("User " + username + " logged in.");
@@ -94,12 +88,11 @@ public class ChatServer {
         return bannedUsers.contains(username);
     }
 
-    // ---------- 管理员命令相关方法 ----------
-    /**
-     * 向所有在线客户端广播消息（包括系统消息）
-     */
     public void broadcastToAll(String message) {
-        if (message == null || message.isEmpty()) return;
+        if (message == null || message.isEmpty()) {
+            return;
+        }
+
         String formatted = "[系统] " + message;
         for (ClientHandler handler : onlineClients.values()) {
             try {
@@ -112,11 +105,40 @@ public class ChatServer {
         Logger.getInstance().info("广播: " + message);
     }
 
-    /**
-     * 踢出用户（从在线列表移除，关闭连接）
-     */
+    public void sendPrivateMessage(String sender, String target, String content) {
+        if (sender == null || target == null || content == null || target.isEmpty() || content.isEmpty()) {
+            return;
+        }
+
+        ClientHandler targetHandler = onlineClients.get(target);
+        if (targetHandler == null) {
+            ClientHandler senderHandler = onlineClients.get(sender);
+            if (senderHandler != null) {
+                senderHandler.sendMessage("[系统] 用户 " + target + " 当前不在线，私聊发送失败。");
+            }
+            return;
+        }
+
+        String payload = new Message(Protocol.PRIVATE, sender, target, content).encode();
+        targetHandler.sendMessage(payload);
+        Logger.getInstance().info("私聊: " + sender + " -> " + target + ": " + content);
+    }
+
+    public void pushOnlineUsers() {
+        List<String> users = getOnlineUsers();
+        Collections.sort(users);
+        String payload = "ONLINE_USERS|" + String.join(",", users);
+
+        for (ClientHandler handler : onlineClients.values()) {
+            handler.sendMessage(payload);
+        }
+    }
+
     public boolean kickUser(String username) {
-        if (username == null || username.isEmpty()) return false;
+        if (username == null || username.isEmpty()) {
+            return false;
+        }
+
         ClientHandler handler = onlineClients.remove(username);
         if (handler != null) {
             try {
@@ -132,11 +154,11 @@ public class ChatServer {
         return false;
     }
 
-    /**
-     * 封禁用户（加入黑名单并踢出）
-     */
     public boolean banUser(String username) {
-        if (username == null || username.isEmpty()) return false;
+        if (username == null || username.isEmpty()) {
+            return false;
+        }
+
         bannedUsers.add(username);
         ClientHandler handler = onlineClients.remove(username);
         if (handler != null) {
@@ -152,11 +174,11 @@ public class ChatServer {
         return true;
     }
 
-    /**
-     * 解封用户（从黑名单移除）
-     */
     public boolean unbanUser(String username) {
-        if (username == null || username.isEmpty()) return false;
+        if (username == null || username.isEmpty()) {
+            return false;
+        }
+
         boolean removed = bannedUsers.remove(username);
         if (removed) {
             Logger.getInstance().info("用户 " + username + " 已解封。");
@@ -164,31 +186,27 @@ public class ChatServer {
         return removed;
     }
 
-    /**
-     * 获取当前在线用户列表
-     */
     public List<String> getOnlineUsers() {
         return new ArrayList<>(onlineClients.keySet());
     }
 
-    /**
-     * 关闭服务器（优雅停机）
-     */
     public void shutdown() {
-        if (!running) return;
+        if (!running) {
+            return;
+        }
+
         running = false;
         Logger.getInstance().info("服务器正在关闭...");
 
-        // 向所有客户端发送停机通知并断开
         for (ClientHandler handler : onlineClients.values()) {
             try {
                 handler.sendMessage("服务器正在关闭，请重新连接。");
                 handler.closeConnection();
-            } catch (Exception e) { /* 忽略 */ }
+            } catch (Exception ignored) {
+            }
         }
         onlineClients.clear();
 
-        // 关闭 ServerSocket
         try {
             if (serverSocket != null && !serverSocket.isClosed()) {
                 serverSocket.close();
@@ -196,6 +214,7 @@ public class ChatServer {
         } catch (IOException e) {
             Logger.getInstance().error("关闭 ServerSocket 出错: " + e.getMessage());
         }
+
         Logger.getInstance().info("服务器已关闭。");
     }
 }

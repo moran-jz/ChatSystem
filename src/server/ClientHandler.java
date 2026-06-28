@@ -1,10 +1,18 @@
 package server;
 
-import java.net.*;
-import java.io.*;
+import admin.AdminCommandHandler;
+import common.Message;
+import common.Protocol;
 import log.Logger;
-import admin.*;
-import security.*;
+import security.AuthResult;
+import security.SecurityBootstrap;
+import security.UserManager;
+
+import java.io.DataInputStream;
+import java.io.DataOutputStream;
+import java.io.EOFException;
+import java.io.IOException;
+import java.net.Socket;
 
 /**
  * 客户端处理器（每个客户端一个线程）
@@ -16,7 +24,7 @@ public class ClientHandler extends Thread {
     private final ChatServer server;
     private DataInputStream dis;
     private DataOutputStream dos;
-    private String username;           // 登录后的用户名
+    private String username;
 
     public ClientHandler(Socket socket, ChatServer server) {
         this.socket = socket;
@@ -32,19 +40,16 @@ public class ClientHandler extends Thread {
     @Override
     public void run() {
         try {
-            // 1. 读取操作类型
-            String operation = dis.readUTF();  // "LOGIN" 或 "REGISTER"
+            String operation = dis.readUTF();
             String username = dis.readUTF();
             String password = dis.readUTF();
 
-            // 检查封禁（登录和注册都检查）
             if (server.isBanned(username)) {
                 sendMessage("您的账号已被封禁，无法操作。");
                 closeConnection();
                 return;
             }
 
-            // ---------- 处理注册（不自动登录） ----------
             if ("REGISTER".equals(operation)) {
                 AuthResult result = UserManager.getInstance().register(username, password);
                 if (result.isSuccess()) {
@@ -52,21 +57,16 @@ public class ClientHandler extends Thread {
                 } else {
                     sendMessage("注册失败：" + result.getMessage());
                 }
-                // 关闭输出流，表示不会再发送数据
+
                 socket.shutdownOutput();
-                // 等待客户端主动关闭连接
                 try {
                     while (dis.read() != -1) {
-                        // 忽略客户端可能发送的数据，直到客户端关闭
                     }
-                } catch (IOException e) {
-                    // 客户端断开，正常
+                } catch (IOException ignored) {
                 }
-                // 注册完成后，线程结束，finally 会关闭资源
                 return;
             }
 
-            // ---------- 处理登录 ----------
             if ("LOGIN".equals(operation)) {
                 boolean success = SecurityBootstrap.authenticate(username, password);
                 if (success) {
@@ -82,16 +82,20 @@ public class ClientHandler extends Thread {
                 return;
             }
 
-            // 登录成功后注册到在线列表
             this.username = username;
             server.addClient(username, this);
             sendMessage("欢迎 " + username);
             server.broadcastToAll(username + " 加入了聊天室。");
+            server.pushOnlineUsers();
 
-            // ---------- 主消息循环 ----------
             String message;
             while ((message = dis.readUTF()) != null) {
-                // 处理管理员命令（传入当前用户名，用于权限校验）
+                Message protocolMessage = Message.decode(message);
+                if (protocolMessage != null && Protocol.PRIVATE.equals(protocolMessage.getType())) {
+                    server.sendPrivateMessage(this.username, protocolMessage.getReceiver(), protocolMessage.getContent());
+                    continue;
+                }
+
                 if (message.startsWith("/")) {
                     AdminCommandHandler adminHandler = ExtensionManager.getAdminCommandHandler();
                     if (adminHandler != null) {
@@ -105,23 +109,19 @@ public class ClientHandler extends Thread {
                 }
             }
         } catch (EOFException e) {
-            // 客户端正常断开
             Logger.getInstance().info((username != null ? username : "未知用户") + " 断开连接");
         } catch (IOException e) {
             Logger.getInstance().error("ClientHandler error: " + e.getMessage());
         } finally {
-            // 清理资源
             if (username != null && !username.isEmpty()) {
                 server.removeClient(username);
                 server.broadcastToAll(username + " 离开了聊天室。");
+                server.pushOnlineUsers();
             }
             closeConnection();
         }
     }
 
-    /**
-     * 发送消息给该客户端
-     */
     public void sendMessage(String msg) {
         if (dos != null) {
             try {
@@ -133,14 +133,17 @@ public class ClientHandler extends Thread {
         }
     }
 
-    /**
-     * 关闭连接，释放资源
-     */
     public void closeConnection() {
         try {
-            if (dis != null) dis.close();
-            if (dos != null) dos.close();
-            if (socket != null && !socket.isClosed()) socket.close();
+            if (dis != null) {
+                dis.close();
+            }
+            if (dos != null) {
+                dos.close();
+            }
+            if (socket != null && !socket.isClosed()) {
+                socket.close();
+            }
         } catch (IOException e) {
             Logger.getInstance().error("Error closing connection: " + e.getMessage());
         }
