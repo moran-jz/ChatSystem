@@ -59,13 +59,11 @@ public class ChatServer {
         // 使用 try-with-resources 管理 ServerSocket
         try (ServerSocket serverSocket = new ServerSocket(port)) {
             this.serverSocket = serverSocket;   // 保留引用供 shutdown 使用
-            System.out.println("Chat Server started on port " + port);
-            Log.initLog();   // 假设您的 Log 类存在
+            Logger.getInstance().info("Chat Server started on port " + port);
 
             while (running) {
                 Socket clientSocket = serverSocket.accept();
-                System.out.println(clientSocket.getRemoteSocketAddress() + " connect.");
-                Log.add(clientSocket.getRemoteSocketAddress() + " connect.");
+                Logger.getInstance().info(clientSocket.getRemoteSocketAddress() + " connect.");
 
                 // 传入 this 引用，让 ClientHandler 能调用广播等方法
                 ClientHandler handler = new ClientHandler(clientSocket, this);
