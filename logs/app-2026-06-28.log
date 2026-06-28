@@ -1,0 +1,91 @@
+[2026-06-28 12:15:39.870] [INFO] ExtensionManager initialization started...
+[2026-06-28 12:15:39.968] [INFO] File HTTP Server started on port 8080
+[2026-06-28 12:15:39.969] [INFO] FileHttpServer started on port 8080
+[2026-06-28 12:15:39.970] [INFO] UDPBroadcastServer started on port 9999
+[2026-06-28 12:15:39.971] [INFO] AdminCommandHandler initialized
+[2026-06-28 12:15:39.972] [INFO] ExtensionManager initialization completed.
+[2026-06-28 12:15:39.973] [INFO] UDP Broadcast Server started on port 9999
+[2026-06-28 12:15:57.820] [INFO] User CJG logged in.
+[2026-06-28 12:15:57.825] [INFO] 广播: CJG 加入了聊天室。
+[2026-06-28 12:16:38.800] [INFO] File uploaded: 流程图.txt
+[2026-06-28 12:16:38.810] [INFO] Upload successful: 流程图.txt
+[2026-06-28 12:16:38.812] [INFO] 广播: CJG: [文件] CJG 上传了文件: 流程图.txt
+[2026-06-28 12:17:18.698] [INFO] 广播: CJG: 你们好！我是CJG！
+[2026-06-28 12:18:32.195] [INFO] User TEST logged in.
+[2026-06-28 12:18:32.198] [INFO] 广播: TEST 加入了聊天室。
+[2026-06-28 12:19:26.852] [INFO] ExtensionManager initialization started...
+[2026-06-28 12:19:26.942] [INFO] File HTTP Server started on port 8080
+[2026-06-28 12:19:26.944] [INFO] FileHttpServer started on port 8080
+[2026-06-28 12:19:26.945] [INFO] UDPBroadcastServer started on port 9999
+[2026-06-28 12:19:26.946] [INFO] AdminCommandHandler initialized
+[2026-06-28 12:19:26.947] [INFO] ExtensionManager initialization completed.
+[2026-06-28 12:19:26.948] [INFO] UDP Broadcast Server started on port 9999
+[2026-06-28 12:19:46.733] [INFO] User CJG logged in.
+[2026-06-28 12:19:46.737] [INFO] 广播: CJG 加入了聊天室。
+[2026-06-28 12:20:05.597] [INFO] CJG 断开连接
+[2026-06-28 12:20:05.598] [INFO] User CJG disconnected.
+[2026-06-28 12:20:05.600] [INFO] 广播: CJG 离开了聊天室。
+[2026-06-28 12:20:13.233] [INFO] ExtensionManager initialization started...
+[2026-06-28 12:20:13.331] [INFO] File HTTP Server started on port 8080
+[2026-06-28 12:20:13.332] [INFO] FileHttpServer started on port 8080
+[2026-06-28 12:20:13.333] [INFO] UDPBroadcastServer started on port 9999
+[2026-06-28 12:20:13.334] [INFO] AdminCommandHandler initialized
+[2026-06-28 12:20:13.334] [INFO] ExtensionManager initialization completed.
+[2026-06-28 12:20:13.336] [INFO] UDP Broadcast Server started on port 9999
+[2026-06-28 12:20:18.085] [INFO] User admin logged in.
+[2026-06-28 12:20:18.088] [INFO] 广播: admin 加入了聊天室。
+[2026-06-28 12:20:37.242] [INFO] User CJG logged in.
+[2026-06-28 12:20:37.247] [INFO] 广播: CJG 加入了聊天室。
+[2026-06-28 12:21:18.077] [INFO] ExtensionManager initialization started...
+[2026-06-28 12:21:18.173] [INFO] File HTTP Server started on port 8080
+[2026-06-28 12:21:18.174] [INFO] FileHttpServer started on port 8080
+[2026-06-28 12:21:18.175] [INFO] UDPBroadcastServer started on port 9999
+[2026-06-28 12:21:18.176] [INFO] AdminCommandHandler initialized
+[2026-06-28 12:21:18.177] [INFO] ExtensionManager initialization completed.
+[2026-06-28 12:21:18.180] [INFO] UDP Broadcast Server started on port 9999
+[2026-06-28 12:21:23.382] [INFO] User admin logged in.
+[2026-06-28 12:21:23.385] [INFO] 广播: admin 加入了聊天室。
+[2026-06-28 12:21:56.555] [INFO] User admin logged in.
+[2026-06-28 12:21:56.558] [INFO] 广播: admin 加入了聊天室。
+[2026-06-28 12:23:22.379] [INFO] ExtensionManager initialization started...
+[2026-06-28 12:23:22.463] [INFO] File HTTP Server started on port 8080
+[2026-06-28 12:23:22.464] [INFO] FileHttpServer started on port 8080
+[2026-06-28 12:23:22.465] [INFO] UDPBroadcastServer started on port 9999
+[2026-06-28 12:23:22.466] [INFO] AdminCommandHandler initialized
+[2026-06-28 12:23:22.466] [INFO] ExtensionManager initialization completed.
+[2026-06-28 12:23:22.468] [INFO] UDP Broadcast Server started on port 9999
+[2026-06-28 12:23:28.309] [INFO] User admin logged in.
+[2026-06-28 12:23:28.314] [INFO] 广播: admin 加入了聊天室。
+[2026-06-28 12:23:43.858] [INFO] User CJG logged in.
+[2026-06-28 12:23:43.861] [INFO] 广播: CJG 加入了聊天室。
+[2026-06-28 12:24:11.761] [INFO] File downloaded: file1.dat
+[2026-06-28 12:24:11.770] [INFO] Download successful: file1.dat saved to ./downloads/
+[2026-06-28 12:24:47.754] [INFO] File downloaded: 流程图.txt
+[2026-06-28 12:24:47.764] [INFO] Download successful: 流程图.txt saved to ./downloads/
+[2026-06-28 12:25:37.267] [INFO] User TEST logged in.
+[2026-06-28 12:25:37.270] [INFO] 广播: TEST 加入了聊天室。
+[2026-06-28 12:25:46.825] [INFO] 广播: TEST: 大家好我是测试人机
+[2026-06-28 12:26:02.916] [INFO] 用户 TEST 被管理员踢出。
+[2026-06-28 12:26:02.917] [ERROR] ClientHandler error: Socket closed
+[2026-06-28 12:26:02.919] [INFO] 广播: TEST 被管理员踢出。
+[2026-06-28 12:26:02.920] [INFO] User TEST disconnected.
+[2026-06-28 12:26:02.923] [INFO] 广播: User TEST has been kicked by admin.
+[2026-06-28 12:26:02.923] [INFO] 广播: TEST 离开了聊天室。
+[2026-06-28 12:26:34.201] [INFO] 广播: [Admin] message
+[2026-06-28 12:26:50.298] [INFO] 广播: [Admin] 我是管理员，那个人机被我踢了。
+[2026-06-28 12:27:22.571] [INFO] User TEST logged in.
+[2026-06-28 12:27:22.575] [INFO] 广播: TEST 加入了聊天室。
+[2026-06-28 12:27:30.993] [INFO] 广播: TEST: 嗨嗨嗨，我又回来了！
+[2026-06-28 12:27:39.593] [INFO] 用户 TEST 被封禁。
+[2026-06-28 12:27:39.593] [ERROR] ClientHandler error: Socket closed
+[2026-06-28 12:27:39.596] [INFO] User TEST disconnected.
+[2026-06-28 12:27:39.596] [INFO] 广播: TEST 已被管理员封禁。
+[2026-06-28 12:27:39.599] [INFO] 广播: TEST 离开了聊天室。
+[2026-06-28 12:27:39.600] [INFO] 广播: User TEST has been banned by admin.
+[2026-06-28 12:28:06.657] [INFO] 广播: admin: 门外竖着
+[2026-06-28 12:28:46.585] [INFO] 用户 TEST 已解封。
+[2026-06-28 12:29:06.366] [INFO] User TEST logged in.
+[2026-06-28 12:29:06.370] [INFO] 广播: TEST 加入了聊天室。
+[2026-06-28 12:29:11.264] [INFO] 广播: TEST: 我错了
+[2026-06-28 12:29:22.857] [INFO] 广播: admin: 下不为例
+[2026-06-28 12:31:34.793] [INFO] 广播: [Admin] 所有人别当人机！
