@@ -7,7 +7,7 @@ import java.util.concurrent.ConcurrentHashMap;
 
 public class OnlineUserManager {
     private static final Map<String, NioClientSession> onlineUsers = new ConcurrentHashMap<>();
-    private static final Set<String> bannedList=new HashSet<>();
+    private static final Set<String> bannedList = new HashSet<>();
 
     public static void addUser(String username, NioClientSession session) {
         onlineUsers.put(username, session);
@@ -36,45 +36,34 @@ public class OnlineUserManager {
         return String.join(",", onlineUsers.keySet());
     }
 
-    public static void groupBroadcast(String Username, String msg) {
+    public static void groupBroadcast(String username, String msg) {
         for (Map.Entry<String, NioClientSession> entry : onlineUsers.entrySet()) {
-            if (!entry.getKey().equals(Username)) {
+            if (!entry.getKey().equals(username)) {
                 entry.getValue().enqueueWrite(msg);
             }
         }
     }
 
-    public static void broadcast(String msg)
-    {
-        for (Map.Entry<String, NioClientSession> entry : onlineUsers.entrySet()) 
-        {
+    public static void broadcast(String msg) {
+        for (Map.Entry<String, NioClientSession> entry : onlineUsers.entrySet()) {
             entry.getValue().enqueueWrite(msg);
         }
     }
-    
-    public static boolean kick(String username)
-    {
-        if(isOnline(username))
-        {
+
+    public static boolean kick(String username) {
+        if (isOnline(username)) {
             onlineUsers.remove(username);
             return true;
         }
         return false;
     }
 
-    public static boolean isBanned(String username)
-    {
-        if(bannedList.contains(username))
-        {
-            return true;
-        }
-        return false;
+    public static boolean isBanned(String username) {
+        return bannedList.contains(username);
     }
 
-    public static boolean ban(String username)
-    {
-        if(isOnline(username))
-        {
+    public static boolean ban(String username) {
+        if (isOnline(username)) {
             onlineUsers.remove(username);
             bannedList.add(username);
             return true;
@@ -82,23 +71,15 @@ public class OnlineUserManager {
         return false;
     }
 
-    public static boolean unban(String username)
-    {
-        if(isBanned(username))
-        {
+    public static boolean unban(String username) {
+        if (isBanned(username)) {
             bannedList.remove(username);
             return true;
         }
         return false;
     }
 
-    public static Set<String> getUsersList()
-    {
+    public static Set<String> getUsersList() {
         return onlineUsers.keySet();
     }
-
-
-
-
-
 }

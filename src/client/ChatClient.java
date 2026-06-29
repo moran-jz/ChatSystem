@@ -1,7 +1,7 @@
 package client;
 
 import javax.swing.SwingUtilities;
-import java.net.Socket;
+import java.net.SocketTimeoutException;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
@@ -10,40 +10,42 @@ public class ChatClient {
     private static final String SERVER_IP = "127.0.0.1";
     private static final int SERVER_PORT = 9000;
 
-    private static Socket socket;
     private static ClientConnection connection;
     private static ExecutorService receiverExecutor;
-    private static volatile boolean running = false; // 接收线程运行标志
+    private static volatile boolean running = false;
 
     public static void main(String[] args) {
         try {
-            socket = new Socket(SERVER_IP, SERVER_PORT);
-            connection = new ClientConnection(socket);
-
-            // 启动 GUI（登录界面）
+            connection = new ClientConnection(SERVER_IP, SERVER_PORT);
             SwingUtilities.invokeLater(() -> new LoginFrame(connection).setVisible(true));
-
-            // 注册关闭钩子，确保资源释放
             Runtime.getRuntime().addShutdownHook(new Thread(ChatClient::shutdown));
-
         } catch (Exception e) {
             e.printStackTrace();
+            System.err.println("无法连接到服务器，请确认服务器已启动");
         }
     }
 
-    /**
-     * 登录成功后调用，启动接收线程
-     */
     public static void startReceiver() {
-        if (running) return; // 防止重复启动
+        if (running) return;
         running = true;
         receiverExecutor = Executors.newSingleThreadExecutor();
         receiverExecutor.execute(() -> {
             try {
                 while (running && connection.isConnected()) {
-                    String msg = connection.receive();
-                    System.out.println("Server: " + msg);
-                    ClientGUI.onMessage(msg);
+                    try {
+                        String msg = connection.receive();
+                        if (msg == null) {
+                            // 对端关闭连接
+                            System.out.println("服务器关闭了连接");
+                            break;
+                        }
+                        System.out.println("Server: " + msg);
+                        ClientGUI.onMessage(msg);
+                    } catch (SocketTimeoutException e) {
+                        // 读超时是正常的，继续等待下一条消息
+                        System.out.println("读取超时，继续等待...");
+                        // 不退出循环
+                    }
                 }
             } catch (Exception e) {
                 if (running) {
@@ -56,9 +58,6 @@ public class ChatClient {
         });
     }
 
-    /**
-     * 关闭资源（窗口关闭时调用）
-     */
     public static void shutdown() {
         running = false;
         if (connection != null) {

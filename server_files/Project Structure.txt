@@ -1,0 +1,42 @@
+ChatSystem/
+
+├── common/                
+│   ├── Message.java
+│   ├── Protocol.java
+│
+├── server/
+│   ├── ChatServer.java   
+│   ├── ClientHandler.java
+│   ├── MessageRouter.java
+│   ├── ExtensionManager.java
+│   ├── OnlineUserManager.java
+│
+├── security/
+│   ├── UserManager.java  
+│   ├── AuthService.java
+│   ├── AuthResult.java
+│   ├── PasswordUtil.java
+│   ├── SecurityBootstrap.java
+│   ├── SSLContextBuilder.java
+│
+├── client/
+│   ├── ChatClient.java
+│   ├── RegisterDialog.java
+│   ├── ChatWindow.java
+│   ├── PrivateChatWindow.java
+│   ├── ClientGUI.java    
+│   ├── ClientConnection.java    
+│   ├── LoginFrame.java
+│
+├── file/
+│   ├── FileHttpServer.java 
+│   ├── FileClient.java
+│
+├── udp/
+│   ├── UDPBroadcastServer.java 
+│
+├── log/
+│   ├── Logger.java       
+│
+└── admin/
+    ├── AdminCommandHandler.java 

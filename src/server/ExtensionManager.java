@@ -6,7 +6,6 @@ import udp.*;
 import admin.*;
 import log.Logger;
 
-
 public class ExtensionManager {
 
     private static FileHttpServer fileHttpServer;
@@ -14,15 +13,10 @@ public class ExtensionManager {
     private static UDPBroadcastServer udpBroadcastServer;
     private static AdminCommandHandler adminCommandHandler;
 
-    /**
-     * 无参初始化方法
-     * 内部通过 ChatServer.getInstance() 获取服务器实例
-     */
     public static void init() {
         Logger logger = Logger.getInstance();
         logger.info("ExtensionManager initialization started...");
 
-        // 获取 ChatServer 单例
         ChatServer chatServer = ChatServer.getInstance();
         if (chatServer == null) {
             logger.error("ChatServer instance is null. Please ensure ChatServer is initialized before calling ExtensionManager.init()");
@@ -30,7 +24,6 @@ public class ExtensionManager {
         }
 
         try {
-            // 1. 启动 HTTP 文件服务器
             fileHttpServer = new FileHttpServer();
             fileHttpServer.start();
             logger.info("FileHttpServer started on port 8080");
@@ -39,7 +32,6 @@ public class ExtensionManager {
         }
 
         try {
-            // 2. 启动 UDP 广播服务器
             udpBroadcastServer = new UDPBroadcastServer(chatServer);
             udpBroadcastThread = new Thread(udpBroadcastServer, "UDP-Broadcast-Thread");
             udpBroadcastThread.start();
@@ -49,11 +41,11 @@ public class ExtensionManager {
         }
 
         try {
-            // 3. 初始化管理员命令处理器
             adminCommandHandler = new AdminCommandHandler(chatServer);
             logger.info("AdminCommandHandler initialized");
         } catch (Exception e) {
             logger.error("Failed to initialize AdminCommandHandler: " + e.getMessage());
+            e.printStackTrace();
         }
 
         logger.info("ExtensionManager initialization completed.");
@@ -82,4 +74,4 @@ public class ExtensionManager {
     public static AdminCommandHandler getAdminCommandHandler() {
         return adminCommandHandler;
     }
-};
+}

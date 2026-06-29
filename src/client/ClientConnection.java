@@ -1,39 +1,35 @@
 package client;
 
 import java.io.*;
-import java.net.Socket;
+import java.net.*;
 
 public class ClientConnection {
     private Socket socket;
-    private DataInputStream dis;
-    private DataOutputStream dos;
-    private volatile boolean connected = true;
+    private PrintWriter out;
+    private BufferedReader in;
 
-    public ClientConnection(Socket socket) throws IOException {
-        this.socket = socket;
-        this.dis = new DataInputStream(socket.getInputStream());
-        this.dos = new DataOutputStream(socket.getOutputStream());
+    public ClientConnection(String host, int port) throws IOException {
+        socket = new Socket();
+        socket.connect(new InetSocketAddress(host, port), 5000);
+        socket.setSoTimeout(5000);
+        out = new PrintWriter(socket.getOutputStream(), true);
+        in = new BufferedReader(new InputStreamReader(socket.getInputStream()));
     }
 
-    // 发送消息（线程安全）
-    public synchronized void send(String msg) throws IOException {
-        if (!connected) throw new IOException("连接已关闭");
-        dos.writeUTF(msg);
-        dos.flush();
+    public void send(String message) throws IOException {
+        if (out == null) throw new IOException("连接未建立");
+        out.println(message);
     }
 
-    // 接收消息（阻塞）
     public String receive() throws IOException {
-        if (!connected) throw new IOException("连接已关闭");
-        return dis.readUTF();
+        if (in == null) throw new IOException("连接未建立");
+        return in.readLine();
     }
 
-    // 关闭连接
-    public synchronized void close() {
-        connected = false;
+    public void close() {
         try {
-            if (dis != null) dis.close();
-            if (dos != null) dos.close();
+            if (in != null) in.close();
+            if (out != null) out.close();
             if (socket != null) socket.close();
         } catch (IOException e) {
             e.printStackTrace();
@@ -41,6 +37,6 @@ public class ClientConnection {
     }
 
     public boolean isConnected() {
-        return connected;
+        return socket != null && socket.isConnected() && !socket.isClosed();
     }
 }

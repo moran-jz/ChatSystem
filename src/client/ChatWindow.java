@@ -1,198 +1,182 @@
 package client;
 
-import file.FileClient;
+import common.Protocol;
 
 import javax.swing.*;
 import java.awt.*;
-import java.awt.event.WindowAdapter;
-import java.awt.event.WindowEvent;
 import java.io.File;
-import java.util.List;
+import java.net.URLEncoder;
 
 public class ChatWindow extends JFrame {
-    private final JTextArea chatArea;
-    private final JTextField inputField;
-    private final DefaultListModel<String> userListModel;
-    private final JList<String> userList;
-    private final ClientConnection connection;
-    private final String username;
+    private JTextArea chatArea;
+    private JTextField inputField;
+    private JButton sendBtn;
+    private JButton logoutBtn;
+    private JButton fileBtn;
+    private ClientConnection connection;
+    private String username;
 
     public ChatWindow(ClientConnection connection, String username) {
         this.connection = connection;
         this.username = username;
+        initUI();
+        appendMessage("系统", "欢迎 " + username + "，您已登录");
+    }
 
+    public String getUsername() {
+        return username;
+    }
+
+    private void initUI() {
         setTitle("聊天室 - " + username);
-        setSize(760, 500);
+        setSize(500, 400);
         setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
         setLocationRelativeTo(null);
-        setLayout(new BorderLayout(8, 8));
 
         chatArea = new JTextArea();
         chatArea.setEditable(false);
         chatArea.setLineWrap(true);
-        chatArea.setWrapStyleWord(true);
+        JScrollPane scrollPane = new JScrollPane(chatArea);
+        scrollPane.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_ALWAYS);
 
-        JScrollPane chatScroll = new JScrollPane(chatArea);
-
-        JPanel chatPanel = new JPanel(new BorderLayout(0, 8));
-        chatPanel.add(chatScroll, BorderLayout.CENTER);
-
-        JPanel bottom = new JPanel(new BorderLayout(5, 5));
+        JPanel inputPanel = new JPanel(new BorderLayout());
         inputField = new JTextField();
+        sendBtn = new JButton("发送");
+        logoutBtn = new JButton("退出");
+        fileBtn = new JButton("📎");
+
+        JPanel btnPanel = new JPanel(new FlowLayout(FlowLayout.RIGHT));
+        btnPanel.add(fileBtn);
+        btnPanel.add(sendBtn);
+        btnPanel.add(logoutBtn);
+
+        inputPanel.add(inputField, BorderLayout.CENTER);
+        inputPanel.add(btnPanel, BorderLayout.EAST);
+
+        setLayout(new BorderLayout());
+        add(scrollPane, BorderLayout.CENTER);
+        add(inputPanel, BorderLayout.SOUTH);
+
+        sendBtn.addActionListener(e -> sendMessage());
+        logoutBtn.addActionListener(e -> logout());
+        fileBtn.addActionListener(e -> sendFile());
         inputField.addActionListener(e -> sendMessage());
 
-        JButton sendBtn = new JButton("发送");
-        sendBtn.addActionListener(e -> sendMessage());
-
-        JButton fileBtn = new JButton("文件");
-        fileBtn.addActionListener(e -> sendFile());
-
-        JPanel rightPanel = new JPanel(new GridLayout(1, 2, 5, 5));
-        rightPanel.add(fileBtn);
-        rightPanel.add(sendBtn);
-
-        bottom.add(inputField, BorderLayout.CENTER);
-        bottom.add(rightPanel, BorderLayout.EAST);
-        chatPanel.add(bottom, BorderLayout.SOUTH);
-
-        userListModel = new DefaultListModel<>();
-        userList = new JList<>(userListModel);
-        userList.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
-        userList.addMouseListener(new java.awt.event.MouseAdapter() {
+        addWindowListener(new java.awt.event.WindowAdapter() {
             @Override
-            public void mouseClicked(java.awt.event.MouseEvent e) {
-                if (e.getClickCount() == 2) {
-                    openPrivateChat();
-                }
+            public void windowClosing(java.awt.event.WindowEvent e) {
+                logout();
             }
         });
-
-        JButton privateChatBtn = new JButton("发起私聊");
-        privateChatBtn.addActionListener(e -> openPrivateChat());
-
-        JPanel usersPanel = new JPanel(new BorderLayout(0, 8));
-        usersPanel.setBorder(BorderFactory.createTitledBorder("在线用户"));
-        usersPanel.add(new JScrollPane(userList), BorderLayout.CENTER);
-        usersPanel.add(privateChatBtn, BorderLayout.SOUTH);
-
-        JSplitPane splitPane = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT, chatPanel, usersPanel);
-        splitPane.setResizeWeight(0.78);
-        splitPane.setDividerLocation(560);
-        add(splitPane, BorderLayout.CENTER);
-
-        ClientGUI.registerMainWindow(this, connection, username);
-
-        addWindowListener(new WindowAdapter() {
-            @Override
-            public void windowClosing(WindowEvent e) {
-                ClientGUI.unregisterMainWindow(ChatWindow.this);
-                ChatClient.shutdown();
-            }
-        });
-
-        appendGroupMessage("[系统] 欢迎 " + username + "，开始聊天吧！");
     }
 
     private void sendMessage() {
-        String msg = inputField.getText().trim();
-        if (msg.isEmpty()) {
-            return;
-        }
+        String content = inputField.getText().trim();
+        if (content.isEmpty()) return;
 
-        if (msg.startsWith("/download ")) {
-            String filename = msg.substring(10).trim();
-            if (!filename.isEmpty()) {
-                downloadFile(filename);
-            } else {
-                ClientGUI.onMessage("[系统] 请指定要下载的文件名");
+        setSendEnabled(false);
+        inputField.setEnabled(false);
+
+        new Thread(() -> {
+            try {
+                String message = Protocol.BROADCAST + "|" + username + "|all|" + content;
+                connection.send(message);
+
+                SwingUtilities.invokeLater(() -> {
+                    appendMessage(username, content);
+                });
+
+                SwingUtilities.invokeLater(() -> {
+                    inputField.setText("");
+                    setSendEnabled(true);
+                    inputField.setEnabled(true);
+                    inputField.requestFocus();
+                });
+
+            } catch (Exception e) {
+                e.printStackTrace();
+                SwingUtilities.invokeLater(() -> {
+                    JOptionPane.showMessageDialog(ChatWindow.this,
+                            "发送失败: " + e.getMessage());
+                    setSendEnabled(true);
+                    inputField.setEnabled(true);
+                });
             }
-            inputField.setText("");
-            return;
-        }
-
-        try {
-            connection.send(msg);
-            inputField.setText("");
-        } catch (Exception e) {
-            JOptionPane.showMessageDialog(this, "发送失败: " + e.getMessage());
-        }
-    }
-
-    private void downloadFile(String filename) {
-        String saveDir = "./downloads/";
-        ClientGUI.onMessage("[系统] 正在下载文件: " + filename);
-
-        new SwingWorker<Void, Void>() {
-            @Override
-            protected Void doInBackground() {
-                try {
-                    FileClient fc = new FileClient();
-                    boolean ok = fc.downloadFile("http://localhost:8080", filename, saveDir);
-                    if (ok) {
-                        ClientGUI.onMessage("[系统] 文件下载成功: " + filename + " (保存至 " + saveDir + ")");
-                    } else {
-                        ClientGUI.onMessage("[系统] 文件下载失败: " + filename + " (文件不存在或服务器错误)");
-                    }
-                } catch (Exception e) {
-                    ClientGUI.onMessage("[系统] 下载异常: " + e.getMessage());
-                }
-                return null;
-            }
-        }.execute();
+        }).start();
     }
 
     private void sendFile() {
         JFileChooser chooser = new JFileChooser();
-        if (chooser.showOpenDialog(this) == JFileChooser.APPROVE_OPTION) {
-            File file = chooser.getSelectedFile();
-            ClientGUI.onMessage("[系统] 正在上传文件: " + file.getName());
-
-            new SwingWorker<Void, Void>() {
-                @Override
-                protected Void doInBackground() {
-                    try {
-                        FileClient fc = new FileClient();
-                        boolean ok = fc.uploadFile(file.getAbsolutePath(), "http://localhost:8080", file.getName());
-                        String status = ok ? "成功" : "失败";
-                        ClientGUI.onMessage("[系统] 文件上传" + status + ": " + file.getName());
-                        if (ok) {
-                            connection.send("[文件] " + username + " 上传了文件: " + file.getName());
-                        }
-                    } catch (Exception ex) {
-                        ClientGUI.onMessage("[系统] 文件上传异常: " + ex.getMessage());
-                    }
-                    return null;
-                }
-            }.execute();
-        }
-    }
-
-    private void openPrivateChat() {
-        String targetUser = userList.getSelectedValue();
-        if (targetUser == null || targetUser.isEmpty()) {
-            JOptionPane.showMessageDialog(this, "请先从右侧选择一个在线用户");
+        if (chooser.showOpenDialog(this) != JFileChooser.APPROVE_OPTION) {
             return;
         }
-        ClientGUI.openPrivateChat(targetUser);
-    }
+        File file = chooser.getSelectedFile();
+        if (file == null || file.length() > 50 * 1024 * 1024) {
+            JOptionPane.showMessageDialog(this, "文件过大（最大50MB）");
+            return;
+        }
 
-    public void appendGroupMessage(String msg) {
-        chatArea.append(msg + "\n");
-        chatArea.setCaretPosition(chatArea.getDocument().getLength());
-    }
+        String target = JOptionPane.showInputDialog(this, "输入接收者用户名（留空则群发通知）:");
+        if (target == null) return;
+        target = target.trim();
 
-    public void updateOnlineUsers(List<String> users) {
-        String selected = userList.getSelectedValue();
-        userListModel.clear();
+        final String finalTarget = target;
+        final File finalFile = file;
 
-        for (String user : users) {
-            if (!username.equals(user)) {
-                userListModel.addElement(user);
+        setSendEnabled(false);
+        fileBtn.setEnabled(false);
+
+        new Thread(() -> {
+            try {
+                byte[] fileBytes = java.nio.file.Files.readAllBytes(finalFile.toPath());
+                String base64 = java.util.Base64.getEncoder().withoutPadding().encodeToString(fileBytes);
+                String encodedFilename = URLEncoder.encode(finalFile.getName(), "UTF-8");
+
+                String message = "FILE_UPLOAD|" + username + "|" + (finalTarget.isEmpty() ? "all" : finalTarget) + "|"
+                        + encodedFilename + ":" + base64;
+                connection.send(message);
+
+                SwingUtilities.invokeLater(() -> {
+                    appendMessage("系统", "文件 " + finalFile.getName() + " 上传成功");
+                    setSendEnabled(true);
+                    fileBtn.setEnabled(true);
+                });
+
+            } catch (Exception e) {
+                e.printStackTrace();
+                SwingUtilities.invokeLater(() -> {
+                    JOptionPane.showMessageDialog(ChatWindow.this,
+                            "文件上传失败: " + e.getMessage());
+                    setSendEnabled(true);
+                    fileBtn.setEnabled(true);
+                });
             }
-        }
+        }).start();
+    }
 
-        if (selected != null && userListModel.indexOf(selected) >= 0) {
-            userList.setSelectedValue(selected, true);
-        }
+    private void logout() {
+        new Thread(() -> {
+            try {
+                connection.send(Protocol.LOGOUT + "|" + username + "||");
+            } catch (Exception ignored) {}
+        }).start();
+        ClientGUI.setCurrentWindow(null);
+        dispose();
+    }
+
+    public void appendMessage(String sender, String content) {
+        SwingUtilities.invokeLater(() -> {
+            chatArea.append("[" + sender + "] " + content + "\n");
+            chatArea.setCaretPosition(chatArea.getDocument().getLength());
+        });
+    }
+
+    public void appendGroupMessage(String content) {
+        appendMessage("群聊", content);
+    }
+
+    private void setSendEnabled(boolean enabled) {
+        sendBtn.setEnabled(enabled);
+        fileBtn.setEnabled(enabled);
     }
 }

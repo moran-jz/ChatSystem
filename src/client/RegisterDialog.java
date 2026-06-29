@@ -1,5 +1,8 @@
 package client;
 
+import common.Message;
+import common.Protocol;
+
 import javax.swing.*;
 import java.awt.*;
 
@@ -8,9 +11,9 @@ public class RegisterDialog extends JDialog {
     private JPasswordField passField;
     private JPasswordField confirmField;
     private ClientConnection connection;
-    private JFrame parent;
+    private LoginFrame parent;  // 明确类型为 LoginFrame
 
-    public RegisterDialog(JFrame parent, ClientConnection connection) {
+    public RegisterDialog(LoginFrame parent, ClientConnection connection) {
         super(parent, "注册新用户", true);
         this.parent = parent;
         this.connection = connection;
@@ -55,24 +58,47 @@ public class RegisterDialog extends JDialog {
             return;
         }
 
-        try {
-            connection.send("REGISTER");
-            connection.send(username);
-            connection.send(password);
+        // 禁用按钮，防止重复提交
+        setEnabled(false);
+        setCursor(Cursor.getPredefinedCursor(Cursor.WAIT_CURSOR));
 
-            String response = connection.receive();
-            JOptionPane.showMessageDialog(this, response);
-            if (response.startsWith("注册成功")) {
-                if (parent instanceof LoginFrame) {
-                    ((LoginFrame) parent).setUsername(username);
-                }
+        new Thread(() -> {
+            try {
+                // ★★★ 修正：使用 Message 构造标准协议 ★★★
+                Message regMsg = new Message(Protocol.REGISTER, username, "", password);
+                connection.send(regMsg.encode());
+
+                String response = connection.receive();
+
+                SwingUtilities.invokeLater(() -> {
+                    try {
+                        // 根据响应内容判断成功与否
+                        boolean success = response != null &&
+                                (response.contains("SUCCESS") || response.startsWith("注册成功"));
+                        if (success) {
+                            JOptionPane.showMessageDialog(RegisterDialog.this, "注册成功！请登录");
+                            // 将用户名回填到登录框
+                            parent.setUsername(username);
+                            dispose();  // 关闭注册窗口
+                        } else {
+                            JOptionPane.showMessageDialog(RegisterDialog.this,
+                                    "注册失败: " + (response == null ? "无响应" : response));
+                        }
+                    } finally {
+                        setEnabled(true);
+                        setCursor(Cursor.getDefaultCursor());
+                    }
+                });
+
+            } catch (Exception e) {
+                e.printStackTrace();
+                SwingUtilities.invokeLater(() -> {
+                    JOptionPane.showMessageDialog(RegisterDialog.this,
+                            "注册请求异常: " + e.getMessage());
+                    setEnabled(true);
+                    setCursor(Cursor.getDefaultCursor());
+                });
             }
-            // 注册完成后主动关闭连接（告知服务器断开）
-            connection.close();
-            dispose();
-        } catch (Exception e) {
-            JOptionPane.showMessageDialog(this, "注册请求失败: " + e.getMessage());
-        }
+        }).start();
     }
-
 }

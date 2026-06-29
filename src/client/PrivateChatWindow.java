@@ -20,6 +20,8 @@ public class PrivateChatWindow extends JFrame {
         this.currentUser = currentUser;
         this.targetUser = targetUser;
 
+        ClientGUI.registerPrivateChat(targetUser, this);
+
         setTitle("私聊 - " + targetUser);
         setSize(480, 360);
         setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
@@ -58,13 +60,11 @@ public class PrivateChatWindow extends JFrame {
 
     private void sendPrivateMessage() {
         String content = inputField.getText().trim();
-        if (content.isEmpty()) {
-            return;
-        }
+        if (content.isEmpty()) return;
 
         try {
-            String payload = new Message(Protocol.PRIVATE, currentUser, targetUser, content).encode();
-            connection.send(payload);
+            Message msg = new Message(Protocol.PRIVATE, currentUser, targetUser, content);
+            connection.send(msg.encode());
             appendOwnMessage(content);
             inputField.setText("");
         } catch (Exception e) {
@@ -73,12 +73,16 @@ public class PrivateChatWindow extends JFrame {
     }
 
     public void appendIncomingMessage(String sender, String content) {
-        chatArea.append("[" + sender + "] " + content + "\n");
-        chatArea.setCaretPosition(chatArea.getDocument().getLength());
+        SwingUtilities.invokeLater(() -> {
+            chatArea.append("[" + sender + "] " + content + "\n");
+            chatArea.setCaretPosition(chatArea.getDocument().getLength());
+        });
     }
 
     public void appendOwnMessage(String content) {
-        chatArea.append("[我] " + content + "\n");
-        chatArea.setCaretPosition(chatArea.getDocument().getLength());
+        SwingUtilities.invokeLater(() -> {
+            chatArea.append("[我] " + content + "\n");
+            chatArea.setCaretPosition(chatArea.getDocument().getLength());
+        });
     }
 }
