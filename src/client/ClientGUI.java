@@ -2,12 +2,11 @@ package client;
 
 import common.Message;
 import common.Protocol;
+import file.FileClient;
 
 import javax.swing.*;
-import java.awt.*;
 import java.io.*;
 import java.net.URLDecoder;
-import java.net.URLEncoder;
 import java.nio.file.Files;
 import java.util.Base64;
 import java.util.concurrent.ConcurrentHashMap;
@@ -91,9 +90,25 @@ public class ClientGUI {
                             JOptionPane.YES_NO_OPTION
                     );
                     if (response == JOptionPane.YES_OPTION) {
-                        String encoded = URLEncoder.encode(decodedFilename, "UTF-8");
-                        String url = "http://127.0.0.1:8080/download/" + encoded;
-                        Desktop.getDesktop().browse(java.net.URI.create(url));
+                        new Thread(() -> {
+                            FileClient fileClient = new FileClient();
+                            boolean success = fileClient.downloadFile(
+                                    ChatClient.getFileServerBaseUrl(),
+                                    decodedFilename,
+                                    "downloads"
+                            );
+                            SwingUtilities.invokeLater(() -> {
+                                if (currentWindow == null) {
+                                    return;
+                                }
+                                if (success) {
+                                    currentWindow.appendMessage("系统", "文件已下载到: "
+                                            + new File("downloads", new File(decodedFilename).getName()).getAbsolutePath());
+                                } else {
+                                    currentWindow.appendMessage("系统", "文件下载失败: " + decodedFilename);
+                                }
+                            });
+                        }).start();
                     }
                 } catch (Exception ex) {
                     JOptionPane.showMessageDialog(currentWindow, "文件请求处理失败: " + ex.getMessage());
@@ -106,7 +121,7 @@ public class ClientGUI {
                 // content 格式: filename|base64
                 int pipeIndex = content.indexOf('|');
                 if (pipeIndex == -1) return;
-                String filename = content.substring(0, pipeIndex);
+                String filename = new File(content.substring(0, pipeIndex)).getName();
                 String base64 = content.substring(pipeIndex + 1);
                 new Thread(() -> {
                     try {

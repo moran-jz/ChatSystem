@@ -7,8 +7,9 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
 
 public class ChatClient {
-    private static final String SERVER_IP = "127.0.0.1";
+    private static final String SERVER_HOST = "localhost";
     private static final int SERVER_PORT = 9000;
+    private static final int FILE_SERVER_PORT = 8080;
 
     private static ClientConnection connection;
     private static ExecutorService receiverExecutor;
@@ -16,7 +17,7 @@ public class ChatClient {
     
     public static void main(String[] args) {
         try {
-            connection = new ClientConnection(SERVER_IP, SERVER_PORT);
+            connection = new ClientConnection(SERVER_HOST, SERVER_PORT);
             SwingUtilities.invokeLater(() -> new LoginFrame(connection).setVisible(true));
             Runtime.getRuntime().addShutdownHook(new Thread(ChatClient::shutdown));
         } catch (Exception e) {
@@ -28,6 +29,18 @@ public class ChatClient {
     public static ClientConnection getConnection() {
     return connection;
     }
+
+    public static String getFileServerBaseUrl() {
+        return "http://" + formatHostForUrl(SERVER_HOST) + ":" + FILE_SERVER_PORT;
+    }
+
+    private static String formatHostForUrl(String host) {
+        if (host.contains(":") && !(host.startsWith("[") && host.endsWith("]"))) {
+            return "[" + host + "]";
+        }
+        return host;
+    }
+
     public static void startReceiver() {
         if (running) return;
         running = true;

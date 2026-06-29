@@ -1,11 +1,11 @@
 package client;
 
 import common.Protocol;
+import file.FileClient;
 
 import javax.swing.*;
 import java.awt.*;
 import java.io.File;
-import java.net.URLEncoder;
 
 public class ChatWindow extends JFrame {
     private JTextArea chatArea;
@@ -125,16 +125,22 @@ public class ChatWindow extends JFrame {
 
         new Thread(() -> {
             try {
-                byte[] fileBytes = java.nio.file.Files.readAllBytes(finalFile.toPath());
-                String base64 = java.util.Base64.getEncoder().withoutPadding().encodeToString(fileBytes);
-                String encodedFilename = URLEncoder.encode(finalFile.getName(), "UTF-8");
+                FileClient fileClient = new FileClient();
+                boolean uploaded = fileClient.uploadFile(
+                        finalFile.getAbsolutePath(),
+                        ChatClient.getFileServerBaseUrl(),
+                        finalFile.getName()
+                );
+                if (!uploaded) {
+                    throw new IllegalStateException("HTTP 文件上传失败");
+                }
 
-                String message = "FILE_UPLOAD|" + username + "|" + (finalTarget.isEmpty() ? "all" : finalTarget) + "|"
-                        + encodedFilename + ":" + base64;
+                String message = "FILE|" + username + "|" + (finalTarget.isEmpty() ? "all" : finalTarget) + "|"
+                        + finalFile.getName();
                 connection.send(message);
 
                 SwingUtilities.invokeLater(() -> {
-                    appendMessage("系统", "文件 " + finalFile.getName() + " 上传成功");
+                    appendMessage("系统", "文件 " + finalFile.getName() + " 上传成功，已通知其他用户下载");
                     setSendEnabled(true);
                     fileBtn.setEnabled(true);
                 });

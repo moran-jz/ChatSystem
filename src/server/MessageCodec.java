@@ -11,6 +11,9 @@ public class MessageCodec {
         for (int i = start; i < limit; i++) {
             if (buffer.get(i) == (byte) '\n') {
                 int length = i - start;
+                if (length > 0 && buffer.get(i - 1) == (byte) '\r') {
+                    length--;
+                }
                 byte[] lineBytes = new byte[length];
                 buffer.position(start);
                 buffer.get(lineBytes, 0, length);

@@ -83,7 +83,8 @@ public class FileClient {
                 dir.mkdirs();
             }
 
-            File saveFile = new File(dir, remoteFileName);
+            String safeFileName = new File(remoteFileName).getName();
+            File saveFile = new File(dir, safeFileName);
             try (InputStream is = conn.getInputStream();
                  FileOutputStream fos = new FileOutputStream(saveFile)) {
                 byte[] buffer = new byte[4096];

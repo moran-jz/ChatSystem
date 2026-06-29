@@ -1,0 +1,20 @@
+[2026-06-30 00:03:28.276] [INFO] ExtensionManager initialization started...
+[2026-06-30 00:03:28.378] [INFO] File HTTP Server started on port 8080
+[2026-06-30 00:03:28.379] [INFO] FileHttpServer started on port 8080
+[2026-06-30 00:03:28.379] [INFO] UDPBroadcastServer started on port 9999
+[2026-06-30 00:03:28.380] [INFO] AdminCommandHandler initialized
+[2026-06-30 00:03:28.380] [INFO] ExtensionManager initialization completed.
+[2026-06-30 00:03:28.383] [INFO] UDP Broadcast Server started on port 9999
+[2026-06-30 00:16:37.119] [INFO] ExtensionManager initialization started...
+[2026-06-30 00:16:37.271] [INFO] File HTTP Server started on port 8080
+[2026-06-30 00:16:37.294] [INFO] FileHttpServer started on port 8080
+[2026-06-30 00:16:37.296] [INFO] UDPBroadcastServer started on port 9999
+[2026-06-30 00:16:37.297] [INFO] AdminCommandHandler initialized
+[2026-06-30 00:16:37.297] [INFO] ExtensionManager initialization completed.
+[2026-06-30 00:16:37.300] [INFO] UDP Broadcast Server started on port 9999
+[2026-06-30 00:17:24.519] [INFO] File uploaded: 孔子.docx
+[2026-06-30 00:17:24.543] [INFO] Upload successful: 孔子.docx
+[2026-06-30 00:17:36.126] [INFO] File downloaded: 孔子.docx
+[2026-06-30 00:17:36.143] [INFO] Download successful: 孔子.docx saved to downloads
+[2026-06-30 00:18:02.606] [INFO] File uploaded: nihao.txt
+[2026-06-30 00:18:02.608] [INFO] Upload successful: nihao.txt

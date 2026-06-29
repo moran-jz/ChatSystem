@@ -5,6 +5,8 @@ import com.sun.net.httpserver.HttpServer;
 
 import java.io.*;
 import java.net.InetSocketAddress;
+import java.net.URLDecoder;
+import java.nio.charset.StandardCharsets;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.concurrent.Executors;
@@ -53,8 +55,9 @@ public class FileHttpServer {
             String query = exchange.getRequestURI().getQuery();
             String filename = "uploaded_" + System.currentTimeMillis();
             if (query != null && query.startsWith("filename=")) {
-                filename = query.substring(9);
+                filename = URLDecoder.decode(query.substring(9), StandardCharsets.UTF_8.name());
             }
+            filename = new File(filename).getName();
 
             // 保存文件
             Path filePath = Paths.get(STORAGE_DIR, filename);
@@ -86,7 +89,8 @@ public class FileHttpServer {
             }
 
             String path = exchange.getRequestURI().getPath();
-            String filename = path.substring(path.lastIndexOf('/') + 1);
+            String filename = URLDecoder.decode(path.substring(path.lastIndexOf('/') + 1), StandardCharsets.UTF_8.name());
+            filename = new File(filename).getName();
             if (filename.isEmpty()) {
                 exchange.sendResponseHeaders(400, -1); // Bad Request
                 return;
@@ -99,6 +103,8 @@ public class FileHttpServer {
                 return;
             }
 
+            exchange.getResponseHeaders().add("Content-Type", "application/octet-stream");
+            exchange.getResponseHeaders().add("Content-Disposition", "attachment; filename=\"" + filename + "\"");
             exchange.sendResponseHeaders(200, file.length());
             try (OutputStream os = exchange.getResponseBody();
                  FileInputStream fis = new FileInputStream(file)) {

@@ -178,7 +178,11 @@ public class MessageRouter {
         try {
             String encoded = URLEncoder.encode(filename, "UTF-8");
             String notice = "FILE_REQUEST|" + sender + "|" + receiver + "|" + encoded;
-            OnlineUserManager.sendToUser(receiver, notice);
+            if (receiver == null || receiver.isEmpty() || "all".equalsIgnoreCase(receiver)) {
+                OnlineUserManager.groupBroadcast(sender, notice);
+            } else {
+                OnlineUserManager.sendToUser(receiver, notice);
+            }
         } catch (Exception e) {
             e.printStackTrace();
         }
