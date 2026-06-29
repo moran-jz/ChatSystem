@@ -91,7 +91,7 @@ public class AdminCommandHandler {
         try {
             byte[] fileBytes = Files.readAllBytes(file.toPath());
             String base64 = Base64.getEncoder().encodeToString(fileBytes);
-            String msg = "FILE_DOWNLOAD|" + filename + "|" + base64;
+            String msg = "FILE_DOWNLOAD|" + sender + "||" + filename + "|" + base64;
             OnlineUserManager.sendToUser(sender, msg);
             return "文件 " + filename + " 已开始下载。";
         } catch (Exception e) {
