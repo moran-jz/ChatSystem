@@ -122,17 +122,14 @@ public class MessageRouter {
     }
 
     // ========== ★ 管理员命令处理（动态获取 adminHandler） ==========
-    private void handleAdminCommand(NioClientSession session, String sender, String commandLine) {
+    private void handleAdminCommand(NioClientSession session, String sender, String commandLine) 
+    {
         AdminCommandHandler adminHandler = ExtensionManager.getAdminCommandHandler();
         if (adminHandler == null) {
             session.enqueueWrite("SYSTEM|||管理员模块未初始化");
             return;
         }
-
-        // 调用 AdminCommandHandler 处理命令，返回结果字符串
         String result = adminHandler.handleCommand(commandLine, sender);
-
-        // 以系统消息格式发送给发起者（客户端会显示在聊天区）
         session.enqueueWrite("SYSTEM|||" + result);
     }
 
