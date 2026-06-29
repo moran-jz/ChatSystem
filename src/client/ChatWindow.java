@@ -116,11 +116,8 @@ public class ChatWindow extends JFrame {
             return;
         }
 
-        String target = JOptionPane.showInputDialog(this, "输入接收者用户名（留空则群发通知）:");
-        if (target == null) return;
-        target = target.trim();
-
-        final String finalTarget = target;
+        // 默认广播给所有人，不再弹窗选择
+        final String finalTarget = "all";
         final File finalFile = file;
 
         setSendEnabled(false);
