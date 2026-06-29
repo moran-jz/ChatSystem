@@ -123,61 +123,17 @@ public class MessageRouter {
 
     // ========== ★ 管理员命令处理（动态获取 adminHandler） ==========
     private void handleAdminCommand(NioClientSession session, String sender, String commandLine) {
-        // ★ 关键修复：动态获取 AdminCommandHandler，而不是使用成员变量
         AdminCommandHandler adminHandler = ExtensionManager.getAdminCommandHandler();
         if (adminHandler == null) {
             session.enqueueWrite("SYSTEM|||管理员模块未初始化");
             return;
         }
 
-        String[] tokens = commandLine.split("\\s+");
-        String cmd = tokens[0].toLowerCase();
-        String result = "";
+        // 调用 AdminCommandHandler 处理命令，返回结果字符串
+        String result = adminHandler.handleCommand(commandLine, sender);
 
-        try {
-            switch (cmd) {
-                case "/list":
-                    result = "在线用户: " + OnlineUserManager.getUsersList().toString();
-                    break;
-                case "/help":
-                    result = "命令列表: /list, /kick <user>, /ban <user>, /unban <user>, /download <filename>";
-                    break;
-                case "/kick":
-                    if (tokens.length < 2) result = "用法: /kick <用户名>";
-                    else {
-                        boolean kicked = ChatServer.getInstance().kickUser(tokens[1]);
-                        result = kicked ? "已踢出用户: " + tokens[1] : "用户不存在或不在线";
-                    }
-                    break;
-                case "/ban":
-                    if (tokens.length < 2) result = "用法: /ban <用户名>";
-                    else {
-                        boolean banned = ChatServer.getInstance().banUser(tokens[1]);
-                        result = banned ? "已封禁用户: " + tokens[1] : "用户不存在或不在线";
-                    }
-                    break;
-                case "/unban":
-                    if (tokens.length < 2) result = "用法: /unban <用户名>";
-                    else {
-                        boolean unbanned = ChatServer.getInstance().unbanUser(tokens[1]);
-                        result = unbanned ? "已解封用户: " + tokens[1] : "用户未被封禁";
-                    }
-                    break;
-                case "/download":
-                    if (tokens.length < 2) result = "用法: /download <文件名>";
-                    else {
-                        String encoded = URLEncoder.encode(tokens[1], "UTF-8");
-                        result = "文件下载链接: http://127.0.0.1:8080/files/" + encoded + " (请复制到浏览器下载)";
-                    }
-                    break;
-                default:
-                    result = "未知命令，输入 /help 查看帮助";
-            }
-        } catch (Exception e) {
-            result = "执行命令出错: " + e.getMessage();
-        }
-        // 将结果私聊返回给命令发起者
-        session.enqueueWrite("PRIVATE|SYSTEM|" + sender + "|" + result);
+        // 以系统消息格式发送给发起者（客户端会显示在聊天区）
+        session.enqueueWrite("SYSTEM|||" + result);
     }
 
     // ========== 文件上传 ==========
