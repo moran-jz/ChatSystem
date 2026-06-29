@@ -1,6 +1,6 @@
 package client;
 
-import javax.swing.SwingUtilities;
+import javax.swing.*;
 import java.net.SocketTimeoutException;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
@@ -37,6 +37,7 @@ public class ChatClient {
                         if (msg == null) {
                             // 对端关闭连接
                             System.out.println("服务器关闭了连接");
+                            handleDisconnect();  // ★ 新增：处理断开连接
                             break;
                         }
                         System.out.println("Server: " + msg);
@@ -44,17 +45,32 @@ public class ChatClient {
                     } catch (SocketTimeoutException e) {
                         // 读超时是正常的，继续等待下一条消息
                         System.out.println("读取超时，继续等待...");
-                        // 不退出循环
                     }
                 }
             } catch (Exception e) {
                 if (running) {
                     e.printStackTrace();
                     ClientGUI.onMessage("[系统] 与服务器断开连接");
+                    handleDisconnect();  // ★ 新增：异常断开也处理
                 }
             } finally {
                 running = false;
             }
+        });
+    }
+
+    // ★ 新增：处理服务器断开连接的方法
+    private static void handleDisconnect() {
+        running = false;
+        SwingUtilities.invokeLater(() -> {
+            // 关闭当前聊天窗口（如果有）
+            ChatWindow current = ClientGUI.getCurrentWindow();
+            if (current != null) {
+                current.dispose();
+            }
+            // 显示提示并退出程序
+            JOptionPane.showMessageDialog(null, "与服务器的连接已断开，程序将退出。");
+            System.exit(0);
         });
     }
 

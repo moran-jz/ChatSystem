@@ -7,7 +7,7 @@ import java.util.Iterator;
 import java.util.Set;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
-
+import admin.AdminCommandHandler;
 import security.SecurityBootstrap;
 
 public class ChatServer {
@@ -19,12 +19,13 @@ public class ChatServer {
     private volatile boolean running = true;
 
     private MessageRouter router;
-
+    private AdminCommandHandler adminHandler;
     // 业务线程池：用于处理路由、逻辑运算等耗时操作
     private ExecutorService businessExecutor;
 
     private ChatServer() throws IOException {
         this.router = new MessageRouter();
+        this.adminHandler = new AdminCommandHandler(this); 
         // 创建线程池：核心线程数为 CPU 核心数，可根据需要调整
         this.businessExecutor = Executors.newFixedThreadPool(
                 Runtime.getRuntime().availableProcessors());
@@ -36,6 +37,10 @@ public class ChatServer {
 
     public ExecutorService getBusinessExecutor() {
         return businessExecutor;
+    }
+
+    public AdminCommandHandler getAdminHandler() {  
+        return adminHandler;
     }
 
     public boolean kickUser(String username)
@@ -80,9 +85,22 @@ public class ChatServer {
         return OnlineUserManager.getUsersList();
     }
 
-    public void shutdown()
+    public void shutdown() 
     {
+        System.out.println("Server shutting down...");
 
+        // 1. 广播关闭通知给所有在线用户
+        OnlineUserManager.broadcast("SYSTEM|||Server is shutting down now.");
+
+        // 2. 短暂等待，让写队列中的数据尽可能发送出去（非强制，但更友好）
+        try {
+            Thread.sleep(500); // 500ms
+        } catch (InterruptedException ignored) {
+            Thread.currentThread().interrupt();
+        }
+
+        // 3. 调用 stop() 执行实际资源清理
+        stop();
     }
 
 

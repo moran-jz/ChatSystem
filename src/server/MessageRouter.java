@@ -19,8 +19,13 @@ public class MessageRouter {
     // 不再使用成员变量，改为动态获取
     // private final AdminCommandHandler adminHandler = ExtensionManager.getAdminCommandHandler();
 
-    public void route(NioClientSession session, String raw) {
+    public void route(NioClientSession session,String username, String raw) {
         if (raw == null || raw.isEmpty()) return;
+
+        if (raw.startsWith("/")) {
+            handleAdminCommand(session,username,raw);
+            return;
+        }
 
         String[] parts = raw.split("\\|", 4);
         if (parts.length < 2) {
@@ -60,6 +65,11 @@ public class MessageRouter {
 
     // ========== 登录 ==========
     private void handleLogin(NioClientSession session, String username, String password) {
+        if(OnlineUserManager.isBanned(username))
+        {
+            System.out.println("You are banned.");
+            return;
+        }
         boolean ok = SecurityBootstrap.authenticate(username, password);
         if (ok) {
             NioClientSession old = OnlineUserManager.getSession(username);
@@ -89,17 +99,17 @@ public class MessageRouter {
     }
 
     // ========== 私聊 ==========
-    private void handlePrivate(NioClientSession session, String sender, String receiver, String content) {
+    private void handlePrivate(NioClientSession session,String sender, String receiver, String content) {
         if (!OnlineUserManager.isOnline(receiver)) {
-            NioClientSession senderSession = OnlineUserManager.getSession(sender);
-            if (senderSession != null) {
-                senderSession.enqueueWrite("ERROR|SYSTEM||用户 " + receiver + " 不在线");
+            // NioClientSession senderSession = OnlineUserManager.getSession(sender);
+            if (session != null) {
+                session.enqueueWrite("ERROR|SYSTEM||User " + receiver + " is offline");
             }
             return;
         }
         String msg = "PRIVATE|" + sender + "|" + receiver + "|" + content;
         OnlineUserManager.sendToUser(receiver, msg);
-    }
+    }   
 
     // ========== 群聊 / 命令 ==========
     private void handleGroup(NioClientSession session, String sender, String content) {

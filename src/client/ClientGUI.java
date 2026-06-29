@@ -17,6 +17,11 @@ public class ClientGUI {
         currentWindow = window;
     }
 
+    // ★ 新增：获取当前聊天窗口
+    public static ChatWindow getCurrentWindow() {
+        return currentWindow;
+    }
+
     public static void registerPrivateChat(String targetUser, PrivateChatWindow window) {
         privateChats.put(targetUser, window);
     }
@@ -28,7 +33,6 @@ public class ClientGUI {
     public static PrivateChatWindow getPrivateChat(String targetUser) {
         return privateChats.get(targetUser);
     }
-
     public static void onMessage(String raw) {
         if (raw == null || raw.isEmpty()) return;
 

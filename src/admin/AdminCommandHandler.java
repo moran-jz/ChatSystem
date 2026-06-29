@@ -16,7 +16,7 @@ public class AdminCommandHandler {
         // 硬编码管理员账号（可根据需要改为从文件加载）
         admins.add("admin");
         // 可添加更多管理员
-        // admins.add("root");
+        admins.add("root");
     }
 
     /**

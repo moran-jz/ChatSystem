@@ -39,7 +39,7 @@ public class NioClientSession {
             // 将消息处理提交到业务线程池，避免阻塞 Selector 线程
             final String msg = message;
             server.getBusinessExecutor().submit(() -> {
-                server.getRouter().route(this, msg);
+                server.getRouter().route(this,this.getUsername(), msg);
             });
         }
         readBuffer.compact();

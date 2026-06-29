@@ -51,25 +51,29 @@ public class OnlineUserManager {
     }
 
     public static boolean kick(String username) {
-        if (isOnline(username)) {
-            onlineUsers.remove(username);
-            return true;
-        }
-        return false;
+    NioClientSession session = onlineUsers.get(username);
+    if (session != null) {
+        onlineUsers.remove(username);
+        session.disconnect();   // 关闭连接
+        return true;
     }
+    return false;
+}
 
     public static boolean isBanned(String username) {
         return bannedList.contains(username);
     }
 
     public static boolean ban(String username) {
-        if (isOnline(username)) {
-            onlineUsers.remove(username);
-            bannedList.add(username);
-            return true;
-        }
-        return false;
+    NioClientSession session = onlineUsers.get(username);
+    if (session != null) {
+        onlineUsers.remove(username);
+        bannedList.add(username);
+        session.disconnect();   // 关闭连接
+        return true;
     }
+    return false;
+}
 
     public static boolean unban(String username) {
         if (isBanned(username)) {
@@ -82,4 +86,8 @@ public class OnlineUserManager {
     public static Set<String> getUsersList() {
         return onlineUsers.keySet();
     }
+
+
+
+
 }
