@@ -220,7 +220,7 @@ public class ChatClient {
 
 ---
 
-# 9. Next Step
+# 9. Advanced Step
 
 You can extend:
 - ClientHandler logic
