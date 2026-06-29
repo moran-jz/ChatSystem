@@ -39,14 +39,16 @@ public class ClientGUI {
         System.out.println("ClientGUI received: " + raw);
 
         Message msg = Message.decode(raw);
-        if (msg != null) {
+        if (msg != null) 
+        {
             String type = msg.getType();
             String sender = msg.getSender();
             String receiver = msg.getReceiver();
             String content = msg.getContent();
 
-            // ---- 私聊 ----
-            if (Protocol.PRIVATE.equals(type)) {
+                // ---- 私聊 ----
+            if (Protocol.PRIVATE.equals(type)) 
+            {
                 String currentUser = (currentWindow != null) ? currentWindow.getUsername() : null;
                 String target = null;
                 if (currentUser != null && currentUser.equals(sender)) {
@@ -56,9 +58,16 @@ public class ClientGUI {
                 }
                 if (target != null) {
                     PrivateChatWindow pWindow = privateChats.get(target);
-                    if (pWindow != null) {
-                        pWindow.appendIncomingMessage(sender, content);
+                    if (pWindow == null) {
+                        // ★ 自动创建私聊窗口（如果尚未打开）
+                        pWindow = new PrivateChatWindow(
+                            ChatClient.getConnection(),  // 需要 ChatClient 提供一个静态 getConnection 方法
+                            currentUser,
+                            target
+                        );
+                        pWindow.setVisible(true);
                     }
+                    pWindow.appendIncomingMessage(sender, content);
                 }
                 return;
             }

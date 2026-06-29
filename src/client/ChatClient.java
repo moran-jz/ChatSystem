@@ -13,7 +13,7 @@ public class ChatClient {
     private static ClientConnection connection;
     private static ExecutorService receiverExecutor;
     private static volatile boolean running = false;
-
+    
     public static void main(String[] args) {
         try {
             connection = new ClientConnection(SERVER_IP, SERVER_PORT);
@@ -25,6 +25,9 @@ public class ChatClient {
         }
     }
 
+    public static ClientConnection getConnection() {
+    return connection;
+    }
     public static void startReceiver() {
         if (running) return;
         running = true;

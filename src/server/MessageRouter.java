@@ -16,14 +16,12 @@ import java.util.Base64;
 
 public class MessageRouter {
 
-    // 不再使用成员变量，改为动态获取
-    // private final AdminCommandHandler adminHandler = ExtensionManager.getAdminCommandHandler();
-
-    public void route(NioClientSession session,String username, String raw) {
+    public void route(NioClientSession session, String username, String raw) {
         if (raw == null || raw.isEmpty()) return;
 
+        // 所有以 / 开头的命令统一交由 AdminCommandHandler 处理
         if (raw.startsWith("/")) {
-            handleAdminCommand(session,username,raw);
+            handleAdminCommand(session, username, raw);
             return;
         }
 
@@ -65,8 +63,7 @@ public class MessageRouter {
 
     // ========== 登录 ==========
     private void handleLogin(NioClientSession session, String username, String password) {
-        if(OnlineUserManager.isBanned(username))
-        {
+        if (OnlineUserManager.isBanned(username)) {
             System.out.println("You are banned.");
             return;
         }
@@ -99,9 +96,8 @@ public class MessageRouter {
     }
 
     // ========== 私聊 ==========
-    private void handlePrivate(NioClientSession session,String sender, String receiver, String content) {
+    private void handlePrivate(NioClientSession session, String sender, String receiver, String content) {
         if (!OnlineUserManager.isOnline(receiver)) {
-            // NioClientSession senderSession = OnlineUserManager.getSession(sender);
             if (session != null) {
                 session.enqueueWrite("ERROR|SYSTEM||User " + receiver + " is offline");
             }
@@ -109,7 +105,7 @@ public class MessageRouter {
         }
         String msg = "PRIVATE|" + sender + "|" + receiver + "|" + content;
         OnlineUserManager.sendToUser(receiver, msg);
-    }   
+    }
 
     // ========== 群聊 / 命令 ==========
     private void handleGroup(NioClientSession session, String sender, String content) {
@@ -121,9 +117,8 @@ public class MessageRouter {
         OnlineUserManager.groupBroadcast(sender, msg);
     }
 
-    // ========== ★ 管理员命令处理（动态获取 adminHandler） ==========
-    private void handleAdminCommand(NioClientSession session, String sender, String commandLine) 
-    {
+    // ========== 管理员命令处理（统一委托给 AdminCommandHandler） ==========
+    private void handleAdminCommand(NioClientSession session, String sender, String commandLine) {
         AdminCommandHandler adminHandler = ExtensionManager.getAdminCommandHandler();
         if (adminHandler == null) {
             session.enqueueWrite("SYSTEM|||管理员模块未初始化");
@@ -135,6 +130,7 @@ public class MessageRouter {
 
     // ========== 文件上传 ==========
     private void handleFileUpload(NioClientSession session, String sender, String receiver, String data) {
+        // ... 保持不变 ...
         try {
             int colonPos = data.indexOf(':');
             if (colonPos == -1) {

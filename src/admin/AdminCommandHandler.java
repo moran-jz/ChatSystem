@@ -1,8 +1,9 @@
 package admin;
 
 import server.ChatServer;
-import java.util.Set;
-import java.util.HashSet;
+import server.OnlineUserManager;
+
+import java.util.*;
 
 /**
  * 管理员命令处理器（带权限校验）
@@ -10,12 +11,13 @@ import java.util.HashSet;
 public class AdminCommandHandler {
     private final ChatServer chatServer;
     private final Set<String> admins = new HashSet<>();
+    private static final Set<String> KNOWN_COMMANDS = new HashSet<>(Arrays.asList(
+        "/help", "/tell", "/kick", "/ban", "/unban", "/list", "/broadcast", "/shutdown"
+    ));
 
     public AdminCommandHandler(ChatServer chatServer) {
         this.chatServer = chatServer;
-        // 硬编码管理员账号（可根据需要改为从文件加载）
         admins.add("admin");
-        // 可添加更多管理员
         admins.add("root");
     }
 
@@ -34,12 +36,20 @@ public class AdminCommandHandler {
         String command = parts[0].toLowerCase();
         String arg = parts.length > 1 ? parts[1] : "";
 
-        // /help 命令不受权限限制
+        // 1. 先检查命令是否已知
+        if (!KNOWN_COMMANDS.contains(command)) {
+            return "未知命令，输入 /help 查看帮助。";
+        }
+
+        // 2. /help 和 /tell 不需要管理员权限
         if ("/help".equals(command)) {
             return getHelp();
         }
+        if ("/tell".equals(command)) {
+            return tell(sender, arg);
+        }
 
-        // 权限校验
+        // 3. 其他命令需要管理员权限
         if (!admins.contains(sender)) {
             return "权限不足，只有管理员可以执行此命令。";
         }
@@ -64,6 +74,27 @@ public class AdminCommandHandler {
 
     // -------------------- 具体命令实现 --------------------//
 
+    private String tell(String sender, String arg) {
+        if (arg.isEmpty()) {
+            return "用法: /tell <用户名> <消息>";
+        }
+        int spaceIndex = arg.indexOf(' ');
+        if (spaceIndex == -1) {
+            return "用法: /tell <用户名> <消息>";
+        }
+        String targetUser = arg.substring(0, spaceIndex).trim();
+        String message = arg.substring(spaceIndex + 1).trim();
+        if (targetUser.isEmpty() || message.isEmpty()) {
+            return "用法: /tell <用户名> <消息>";
+        }
+        if (!OnlineUserManager.isOnline(targetUser)) {
+            return "用户 " + targetUser + " 不在线。";
+        }
+        String msg = "PRIVATE|" + sender + "|" + targetUser + "|" + message;
+        OnlineUserManager.sendToUser(targetUser, msg);
+        return "私聊消息已发送给 " + targetUser;
+    }
+
     private String kick(String username) {
         if (username.isEmpty()) return "用法: /kick <用户名>";
         boolean result = chatServer.kickUser(username);
@@ -84,8 +115,7 @@ public class AdminCommandHandler {
         return "封禁失败（用户可能已封禁或不存在）。";
     }
 
-    private String unban(String username) 
-    {
+    private String unban(String username) {
         if (username.isEmpty()) return "用法: /unban <用户名>";
         boolean result = chatServer.unbanUser(username);
         return result ? "用户 " + username + " 已解封。" : "解封失败，用户不在封禁列表中。";
@@ -110,6 +140,7 @@ public class AdminCommandHandler {
 
     private String getHelp() {
         return "可用命令:\n" +
+                "/tell <用户名> <消息> - 发送私聊消息\n" +
                 "/kick <用户名>  - 踢出用户\n" +
                 "/ban <用户名>   - 封禁用户\n" +
                 "/unban <用户名> - 解封用户\n" +
