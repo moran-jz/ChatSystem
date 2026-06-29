@@ -1,220 +1,158 @@
 package server;
 
-import common.Message;
-import common.Protocol;
-import log.Logger;
+import java.io.IOException;
+import java.net.InetSocketAddress;
+import java.nio.channels.*;
+import java.util.Iterator;
+import java.util.Set;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+
 import security.SecurityBootstrap;
 
-import java.io.IOException;
-import java.net.ServerSocket;
-import java.net.Socket;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.CopyOnWriteArrayList;
-
 public class ChatServer {
+    private static final int PORT = 9000;
     private static ChatServer instance;
-    private final int port;
-    private ServerSocket serverSocket;
-    private volatile boolean running;
-    private final Map<String, ClientHandler> onlineClients = new ConcurrentHashMap<>();
-    private final Set<String> bannedUsers = Collections.synchronizedSet(new HashSet<>());
-    private final List<String> messageHistory = new CopyOnWriteArrayList<>();
 
-    private ChatServer(int port) {
-        this.port = port;
-        this.running = false;
+    private Selector selector;
+    private ServerSocketChannel serverChannel;
+    private volatile boolean running = true;
+
+    private MessageRouter router;
+
+    // 业务线程池：用于处理路由、逻辑运算等耗时操作
+    private ExecutorService businessExecutor;
+
+    private ChatServer() throws IOException {
+        this.router = new MessageRouter();
+        // 创建线程池：核心线程数为 CPU 核心数，可根据需要调整
+        this.businessExecutor = Executors.newFixedThreadPool(
+                Runtime.getRuntime().availableProcessors());
     }
 
     public static ChatServer getInstance() {
         return instance;
     }
 
-    public static void createInstance(int port) {
-        if (instance == null) {
-            instance = new ChatServer(port);
-        }
+    public ExecutorService getBusinessExecutor() {
+        return businessExecutor;
     }
 
-    public static void main(String[] args) {
-        try {
-            SecurityBootstrap.init();
-            ChatServer.createInstance(9000);
-            ExtensionManager.init();
-            ChatServer.getInstance().start();
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-    }
-
-    public void start() throws IOException {
-        this.running = true;
-        try (ServerSocket serverSocket = new ServerSocket(port)) {
-            this.serverSocket = serverSocket;
-            Logger.getInstance().info("Chat Server started on port " + port);
-
-            while (running) {
-                Socket clientSocket = serverSocket.accept();
-                Logger.getInstance().info(clientSocket.getRemoteSocketAddress() + " connect.");
-
-                ClientHandler handler = new ClientHandler(clientSocket, this);
-                handler.start();
-            }
-        } catch (IOException e) {
-            if (running) {
-                throw e;
-            }
-        } finally {
-            shutdown();
-        }
-    }
-
-    public void addClient(String username, ClientHandler handler) {
-        onlineClients.put(username, handler);
-        Logger.getInstance().info("User " + username + " logged in.");
-    }
-
-    public void removeClient(String username) {
-        onlineClients.remove(username);
-        Logger.getInstance().info("User " + username + " disconnected.");
-    }
-
-    public boolean isBanned(String username) {
-        return bannedUsers.contains(username);
-    }
-
-    public void broadcastToAll(String message) {
-        if (message == null || message.isEmpty()) {
-            return;
-        }
-
-        String formatted = "[系统] " + message;
-        for (ClientHandler handler : onlineClients.values()) {
-            try {
-                handler.sendMessage(formatted);
-            } catch (Exception e) {
-                Logger.getInstance().error("广播失败给 " + handler.getUsername() + ": " + e.getMessage());
-            }
-        }
-        messageHistory.add(formatted);
-        Logger.getInstance().info("广播: " + message);
-    }
-
-    public void sendPrivateMessage(String sender, String target, String content) {
-        if (sender == null || target == null || content == null || target.isEmpty() || content.isEmpty()) {
-            return;
-        }
-
-        ClientHandler targetHandler = onlineClients.get(target);
-        if (targetHandler == null) {
-            ClientHandler senderHandler = onlineClients.get(sender);
-            if (senderHandler != null) {
-                senderHandler.sendMessage("[系统] 用户 " + target + " 当前不在线，私聊发送失败。");
-            }
-            return;
-        }
-
-        String payload = new Message(Protocol.PRIVATE, sender, target, content).encode();
-        targetHandler.sendMessage(payload);
-        Logger.getInstance().info("私聊: " + sender + " -> " + target + ": " + content);
-    }
-
-    public void pushOnlineUsers() {
-        List<String> users = getOnlineUsers();
-        Collections.sort(users);
-        String payload = "ONLINE_USERS|" + String.join(",", users);
-
-        for (ClientHandler handler : onlineClients.values()) {
-            handler.sendMessage(payload);
-        }
-    }
-
-    public boolean kickUser(String username) {
-        if (username == null || username.isEmpty()) {
-            return false;
-        }
-
-        ClientHandler handler = onlineClients.remove(username);
-        if (handler != null) {
-            try {
-                handler.sendMessage("您已被管理员踢出服务器。");
-                handler.closeConnection();
-            } catch (Exception e) {
-                Logger.getInstance().error("踢出用户出错: " + e.getMessage());
-            }
-            Logger.getInstance().info("用户 " + username + " 被管理员踢出。");
-            broadcastToAll(username + " 被管理员踢出。");
+    public boolean kickUser(String username)
+    {
+        if(OnlineUserManager.kick(username))
+        {
             return true;
         }
         return false;
     }
 
-    public boolean banUser(String username) {
-        if (username == null || username.isEmpty()) {
-            return false;
-        }
+    public void broadcast(String msg)
+    {
+        OnlineUserManager.broadcast(msg);
+    }
 
-        bannedUsers.add(username);
-        ClientHandler handler = onlineClients.remove(username);
-        if (handler != null) {
+    public void groupBroadcast(String username,String msg)
+    {
+        OnlineUserManager.groupBroadcast(username, msg);
+    }
+
+    public boolean banUser(String username)
+    {
+        if(OnlineUserManager.ban(username))
+        {
+            return true;
+        }
+        return false;
+    }
+
+    public boolean unbanUser(String username)
+    {
+        if(OnlineUserManager.unban(username))
+        {
+            return true;
+        }
+        return false;
+    }
+
+    public Set<String> getOnlineUsers()
+    {
+        return OnlineUserManager.getUsersList();
+    }
+
+    public void shutdown()
+    {
+
+    }
+
+
+    public void start() throws IOException {
+        selector = Selector.open();
+        serverChannel = ServerSocketChannel.open();
+        serverChannel.configureBlocking(false);
+        serverChannel.bind(new InetSocketAddress(PORT));
+        serverChannel.register(selector, SelectionKey.OP_ACCEPT);
+
+        System.out.println("ChatServer started on port " + PORT);
+
+        while (running) {
             try {
-                handler.sendMessage("您已被管理员封禁。");
-                handler.closeConnection();
-            } catch (Exception e) {
-                Logger.getInstance().error("封禁用户出错: " + e.getMessage());
+                if (selector.select() == 0) continue;
+                Set<SelectionKey> keys = selector.selectedKeys();
+                Iterator<SelectionKey> it = keys.iterator();
+                while (it.hasNext()) {
+                    SelectionKey key = it.next();
+                    it.remove();
+                    handleKey(key);
+                }
+            } catch (IOException e) {
+                e.printStackTrace();
             }
         }
-        Logger.getInstance().info("用户 " + username + " 被封禁。");
-        broadcastToAll(username + " 已被管理员封禁。");
-        return true;
     }
 
-    public boolean unbanUser(String username) {
-        if (username == null || username.isEmpty()) {
-            return false;
-        }
+    private void handleKey(SelectionKey key) throws IOException {
+        if (!key.isValid()) return;
 
-        boolean removed = bannedUsers.remove(username);
-        if (removed) {
-            Logger.getInstance().info("用户 " + username + " 已解封。");
+        if (key.isAcceptable()) {
+            ServerSocketChannel ssc = (ServerSocketChannel) key.channel();
+            SocketChannel sc = ssc.accept();
+            if (sc != null) {
+                sc.configureBlocking(false);
+                NioClientSession session = new NioClientSession(sc, this);
+                sc.register(selector, SelectionKey.OP_READ, session);
+                System.out.println("New connection from " + sc.getRemoteAddress());
+            }
+        } else if (key.isReadable()) {
+            NioClientSession session = (NioClientSession) key.attachment();
+            session.handleRead();  // 该方法内会将业务逻辑提交到线程池
+        } else if (key.isWritable()) {
+            NioClientSession session = (NioClientSession) key.attachment();
+            session.handleWrite();
+            if (session.writeQueue.isEmpty()) {
+                key.interestOps(SelectionKey.OP_READ);
+            }
         }
-        return removed;
     }
 
-    public List<String> getOnlineUsers() {
-        return new ArrayList<>(onlineClients.keySet());
-    }
+    // 暴露给其他组件的 getter
+    public MessageRouter getRouter() { return router; }
+    public Selector getSelector() { return selector; }
 
-    public void shutdown() {
-        if (!running) {
-            return;
-        }
-
+    public void stop() {
         running = false;
-        Logger.getInstance().info("服务器正在关闭...");
-
-        for (ClientHandler handler : onlineClients.values()) {
-            try {
-                handler.sendMessage("服务器正在关闭，请重新连接。");
-                handler.closeConnection();
-            } catch (Exception ignored) {
-            }
-        }
-        onlineClients.clear();
-
+        businessExecutor.shutdown();
         try {
-            if (serverSocket != null && !serverSocket.isClosed()) {
-                serverSocket.close();
-            }
-        } catch (IOException e) {
-            Logger.getInstance().error("关闭 ServerSocket 出错: " + e.getMessage());
-        }
+            if (selector != null) selector.close();
+            if (serverChannel != null) serverChannel.close();
+        } catch (IOException ignored) {}
+    }
 
-        Logger.getInstance().info("服务器已关闭。");
+    public static void main(String[] args) throws IOException {
+        instance = new ChatServer();
+        // 初始化其他模块（此时 instance 已赋值）
+        SecurityBootstrap.init();
+        ExtensionManager.init();
+        instance.start();
     }
 }

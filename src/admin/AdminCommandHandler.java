@@ -1,7 +1,6 @@
 package admin;
 
 import server.ChatServer;
-import java.util.List;
 import java.util.Set;
 import java.util.HashSet;
 
@@ -47,11 +46,11 @@ public class AdminCommandHandler {
 
         switch (command) {
             case "/kick":
-                return kickUser(arg.trim());
+                return kick(arg.trim());
             case "/ban":
-                return banUser(arg.trim());
+                return ban(arg.trim());
             case "/unban":
-                return unbanUser(arg.trim());
+                return unban(arg.trim());
             case "/list":
                 return listUsers();
             case "/broadcast":
@@ -63,43 +62,44 @@ public class AdminCommandHandler {
         }
     }
 
-    // -------------------- 具体命令实现 --------------------
+    // -------------------- 具体命令实现 --------------------//
 
-    private String kickUser(String username) {
+    private String kick(String username) {
         if (username.isEmpty()) return "用法: /kick <用户名>";
         boolean result = chatServer.kickUser(username);
         if (result) {
-            chatServer.broadcastToAll("用户 " + username + " 已被管理员踢出。");
+            chatServer.broadcast("用户 " + username + " 已被管理员踢出。");
             return "用户 " + username + " 已踢出。";
         }
         return "踢出失败，用户可能不在线或不存在。";
     }
 
-    private String banUser(String username) {
+    private String ban(String username) {
         if (username.isEmpty()) return "用法: /ban <用户名>";
         boolean result = chatServer.banUser(username);
         if (result) {
-            chatServer.broadcastToAll("用户 " + username + " 已被管理员封禁。");
+            chatServer.broadcast("用户 " + username + " 已被管理员封禁。");
             return "用户 " + username + " 已封禁。";
         }
         return "封禁失败（用户可能已封禁或不存在）。";
     }
 
-    private String unbanUser(String username) {
+    private String unban(String username) 
+    {
         if (username.isEmpty()) return "用法: /unban <用户名>";
         boolean result = chatServer.unbanUser(username);
         return result ? "用户 " + username + " 已解封。" : "解封失败，用户不在封禁列表中。";
     }
 
     private String listUsers() {
-        List<String> users = chatServer.getOnlineUsers();
+        Set<String> users = chatServer.getOnlineUsers();
         if (users.isEmpty()) return "当前没有在线用户。";
         return "在线用户: " + String.join(", ", users);
     }
 
     private String broadcastMessage(String msg) {
         if (msg.isEmpty()) return "用法: /broadcast <消息内容>";
-        chatServer.broadcastToAll("[管理员广播] " + msg);
+        chatServer.broadcast("[管理员广播] " + msg);
         return "广播已发送。";
     }
 

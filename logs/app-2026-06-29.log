@@ -1,0 +1,56 @@
+[2026-06-29 10:49:26.989] [INFO] ExtensionManager initialization started...
+[2026-06-29 10:49:27.619] [INFO] File HTTP Server started on port 8080
+[2026-06-29 10:49:27.619] [INFO] FileHttpServer started on port 8080
+[2026-06-29 10:49:27.621] [INFO] UDPBroadcastServer started on port 9999
+[2026-06-29 10:49:27.622] [INFO] AdminCommandHandler initialized
+[2026-06-29 10:49:27.623] [INFO] ExtensionManager initialization completed.
+[2026-06-29 10:49:27.628] [INFO] Chat Server started on port 9000
+[2026-06-29 10:49:27.628] [INFO] UDP Broadcast Server started on port 9999
+[2026-06-29 10:49:35.366] [INFO] /127.0.0.1:53013 connect.
+[2026-06-29 10:49:38.600] [INFO] User admin logged in.
+[2026-06-29 10:49:38.602] [INFO] 广播: admin 加入了聊天室。
+[2026-06-29 10:49:44.558] [INFO] admin 断开连接
+[2026-06-29 10:49:44.559] [INFO] User admin disconnected.
+[2026-06-29 10:49:44.560] [INFO] 广播: admin 离开了聊天室。
+[2026-06-29 10:49:46.641] [INFO] /127.0.0.1:53019 connect.
+[2026-06-29 10:50:23.561] [INFO] /127.0.0.1:53030 connect.
+[2026-06-29 10:50:37.095] [INFO] /127.0.0.1:53033 connect.
+[2026-06-29 10:50:41.946] [INFO] User instra logged in.
+[2026-06-29 10:50:41.948] [INFO] 广播: instra 加入了聊天室。
+[2026-06-29 10:50:50.036] [INFO] 广播: instra: 123
+[2026-06-29 10:51:30.651] [INFO] File uploaded: 【神椿横浜決戦！+公演まであと約1週間！】昨日は、バンドメンバーさんそして各制作スタッフも込みのリハ.mp4
+[2026-06-29 10:51:30.661] [INFO] Upload successful: 【神椿横浜決戦！ 公演まであと約1週間！】昨日は、バンドメンバーさんそして各制作スタッフも込みのリハ.mp4
+[2026-06-29 10:51:30.664] [INFO] 广播: instra: [文件] instra 上传了文件: 【神椿横浜決戦！ 公演まであと約1週間！】昨日は、バンドメンバーさんそして各制作スタッフも込みのリハ.mp4
+[2026-06-29 10:51:51.648] [INFO] /127.0.0.1:53043 connect.
+[2026-06-29 10:51:53.305] [INFO] User admin logged in.
+[2026-06-29 10:51:53.307] [INFO] 广播: admin 加入了聊天室。
+[2026-06-29 10:53:18.042] [INFO] File uploaded: 4399生死狙击.exe
+[2026-06-29 10:53:18.042] [INFO] Upload successful: 4399生死狙击.exe
+[2026-06-29 10:53:18.044] [INFO] 广播: instra: [文件] instra 上传了文件: 4399生死狙击.exe
+[2026-06-29 10:54:26.299] [INFO] File downloaded: 4399生死狙击.exe
+[2026-06-29 10:54:26.311] [INFO] Download successful: 4399生死狙击.exe saved to ./downloads/
+[2026-06-29 17:50:20.047] [INFO] ExtensionManager initialization started...
+[2026-06-29 17:50:20.172] [INFO] File HTTP Server started on port 8080
+[2026-06-29 17:50:20.173] [INFO] FileHttpServer started on port 8080
+[2026-06-29 17:50:20.174] [INFO] UDPBroadcastServer started on port 9999
+[2026-06-29 17:50:20.176] [INFO] AdminCommandHandler initialized
+[2026-06-29 17:50:20.178] [INFO] ExtensionManager initialization completed.
+[2026-06-29 17:50:42.025] [INFO] ExtensionManager initialization started...
+[2026-06-29 17:50:42.152] [INFO] File HTTP Server started on port 8080
+[2026-06-29 17:50:42.153] [INFO] FileHttpServer started on port 8080
+[2026-06-29 17:50:42.154] [INFO] UDPBroadcastServer started on port 9999
+[2026-06-29 17:50:42.155] [INFO] AdminCommandHandler initialized
+[2026-06-29 17:50:42.155] [INFO] ExtensionManager initialization completed.
+[2026-06-29 17:53:29.046] [INFO] ExtensionManager initialization started...
+[2026-06-29 17:53:29.158] [INFO] File HTTP Server started on port 8080
+[2026-06-29 17:53:29.159] [INFO] FileHttpServer started on port 8080
+[2026-06-29 17:53:29.160] [INFO] UDPBroadcastServer started on port 9999
+[2026-06-29 17:53:29.161] [INFO] AdminCommandHandler initialized
+[2026-06-29 17:53:29.162] [INFO] ExtensionManager initialization completed.
+[2026-06-29 18:34:10.135] [INFO] ExtensionManager initialization started...
+[2026-06-29 18:34:10.253] [INFO] File HTTP Server started on port 8080
+[2026-06-29 18:34:10.254] [INFO] FileHttpServer started on port 8080
+[2026-06-29 18:34:10.256] [INFO] UDPBroadcastServer started on port 9999
+[2026-06-29 18:34:10.258] [INFO] AdminCommandHandler initialized
+[2026-06-29 18:34:10.258] [INFO] ExtensionManager initialization completed.
+[2026-06-29 18:34:10.262] [INFO] UDP Broadcast Server started on port 9999

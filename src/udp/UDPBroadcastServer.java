@@ -39,7 +39,7 @@ public class UDPBroadcastServer implements Runnable {
 
                 // 将收到的消息通过 TCP 广播给所有在线用户
                 if (chatServer != null) {
-                    chatServer.broadcastToAll("[UDP广播] " + message);
+                    chatServer.broadcast("[UDP广播] " + message);
                 } else {
                     Logger.getInstance().warning("ChatServer reference is null, cannot broadcast.");
                 }
