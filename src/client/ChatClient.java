@@ -7,8 +7,9 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
 
 public class ChatClient {
-    private static final String SERVER_HOST = "localhost";
-    private static final int SERVER_PORT = 9000;
+//    private static final String SERVER_HOST = "localhost"; // DNS解析测试
+    private static final String SERVER_HOST = "127.0.0.1"; // IPv4测试
+//    private static final String SERVER_HOST = "::1"; // IPv6测试    private static final int SERVER_PORT = 9000;
     private static final int FILE_SERVER_PORT = 8080;
 
     private static ClientConnection connection;
