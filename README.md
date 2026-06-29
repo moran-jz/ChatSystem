@@ -14,6 +14,8 @@ This project implements a multi-threaded client-server chat application with:
 - Optional SSL/TLS security
 - Logging + admin commands
 
+**We have 2 versions of implementation for this system (NIO & BIO).**
+
 ---
 
 # 2. High-Level Architecture
