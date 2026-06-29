@@ -285,3 +285,73 @@
 [2026-06-29 21:55:42.251] [INFO] AdminCommandHandler initialized
 [2026-06-29 21:55:42.252] [INFO] ExtensionManager initialization completed.
 [2026-06-29 21:55:42.257] [INFO] UDP Broadcast Server started on port 9999
+[2026-06-29 21:57:08.077] [INFO] ExtensionManager initialization started...
+[2026-06-29 21:57:08.186] [INFO] File HTTP Server started on port 8080
+[2026-06-29 21:57:08.188] [INFO] FileHttpServer started on port 8080
+[2026-06-29 21:57:08.189] [INFO] UDPBroadcastServer started on port 9999
+[2026-06-29 21:57:08.189] [INFO] AdminCommandHandler initialized
+[2026-06-29 21:57:08.190] [INFO] ExtensionManager initialization completed.
+[2026-06-29 21:57:08.195] [INFO] UDP Broadcast Server started on port 9999
+[2026-06-29 22:02:05.379] [INFO] ExtensionManager initialization started...
+[2026-06-29 22:02:05.490] [INFO] File HTTP Server started on port 8080
+[2026-06-29 22:02:05.491] [INFO] FileHttpServer started on port 8080
+[2026-06-29 22:02:05.493] [INFO] UDPBroadcastServer started on port 9999
+[2026-06-29 22:02:05.493] [INFO] AdminCommandHandler initialized
+[2026-06-29 22:02:05.494] [INFO] ExtensionManager initialization completed.
+[2026-06-29 22:02:05.499] [INFO] UDP Broadcast Server started on port 9999
+[2026-06-29 22:05:21.443] [INFO] ExtensionManager initialization started...
+[2026-06-29 22:05:21.561] [INFO] File HTTP Server started on port 8080
+[2026-06-29 22:05:21.561] [INFO] FileHttpServer started on port 8080
+[2026-06-29 22:05:21.563] [INFO] UDPBroadcastServer started on port 9999
+[2026-06-29 22:05:21.564] [INFO] AdminCommandHandler initialized
+[2026-06-29 22:05:21.564] [INFO] ExtensionManager initialization completed.
+[2026-06-29 22:05:21.569] [INFO] UDP Broadcast Server started on port 9999
+[2026-06-29 22:07:18.992] [INFO] ExtensionManager initialization started...
+[2026-06-29 22:07:19.105] [INFO] File HTTP Server started on port 8080
+[2026-06-29 22:07:19.107] [INFO] FileHttpServer started on port 8080
+[2026-06-29 22:07:19.108] [INFO] UDPBroadcastServer started on port 9999
+[2026-06-29 22:07:19.109] [INFO] AdminCommandHandler initialized
+[2026-06-29 22:07:19.110] [INFO] ExtensionManager initialization completed.
+[2026-06-29 22:07:19.115] [INFO] UDP Broadcast Server started on port 9999
+[2026-06-29 22:09:51.137] [INFO] ExtensionManager initialization started...
+[2026-06-29 22:09:51.243] [INFO] File HTTP Server started on port 8080
+[2026-06-29 22:09:51.244] [INFO] FileHttpServer started on port 8080
+[2026-06-29 22:09:51.246] [INFO] UDPBroadcastServer started on port 9999
+[2026-06-29 22:09:51.247] [INFO] AdminCommandHandler initialized
+[2026-06-29 22:09:51.247] [INFO] ExtensionManager initialization completed.
+[2026-06-29 22:09:51.252] [INFO] UDP Broadcast Server started on port 9999
+[2026-06-29 22:11:04.031] [INFO] ExtensionManager initialization started...
+[2026-06-29 22:11:04.143] [INFO] File HTTP Server started on port 8080
+[2026-06-29 22:11:04.144] [INFO] FileHttpServer started on port 8080
+[2026-06-29 22:11:04.145] [INFO] UDPBroadcastServer started on port 9999
+[2026-06-29 22:11:04.146] [INFO] AdminCommandHandler initialized
+[2026-06-29 22:11:04.146] [INFO] ExtensionManager initialization completed.
+[2026-06-29 22:11:04.152] [INFO] UDP Broadcast Server started on port 9999
+[2026-06-29 22:16:46.813] [INFO] ExtensionManager initialization started...
+[2026-06-29 22:16:46.832] [ERROR] Failed to start FileHttpServer: Address already in use: bind
+[2026-06-29 22:16:46.833] [INFO] UDPBroadcastServer started on port 9999
+[2026-06-29 22:16:46.834] [INFO] AdminCommandHandler initialized
+[2026-06-29 22:16:46.835] [INFO] ExtensionManager initialization completed.
+[2026-06-29 22:16:46.838] [ERROR] UDP Socket error: Address already in use: bind
+[2026-06-29 22:17:51.798] [INFO] File downloaded: 1.txt
+[2026-06-29 22:18:30.742] [INFO] ExtensionManager initialization started...
+[2026-06-29 22:18:30.848] [INFO] File HTTP Server started on port 8080
+[2026-06-29 22:18:30.849] [INFO] FileHttpServer started on port 8080
+[2026-06-29 22:18:30.850] [INFO] UDPBroadcastServer started on port 9999
+[2026-06-29 22:18:30.851] [INFO] AdminCommandHandler initialized
+[2026-06-29 22:18:30.852] [INFO] ExtensionManager initialization completed.
+[2026-06-29 22:18:30.856] [INFO] UDP Broadcast Server started on port 9999
+[2026-06-29 22:25:56.089] [INFO] ExtensionManager initialization started...
+[2026-06-29 22:25:56.194] [INFO] File HTTP Server started on port 8080
+[2026-06-29 22:25:56.195] [INFO] FileHttpServer started on port 8080
+[2026-06-29 22:25:56.196] [INFO] UDPBroadcastServer started on port 9999
+[2026-06-29 22:25:56.196] [INFO] AdminCommandHandler initialized
+[2026-06-29 22:25:56.197] [INFO] ExtensionManager initialization completed.
+[2026-06-29 22:25:56.201] [INFO] UDP Broadcast Server started on port 9999
+[2026-06-29 22:27:05.780] [INFO] ExtensionManager initialization started...
+[2026-06-29 22:27:05.893] [INFO] File HTTP Server started on port 8080
+[2026-06-29 22:27:05.894] [INFO] FileHttpServer started on port 8080
+[2026-06-29 22:27:05.895] [INFO] UDPBroadcastServer started on port 9999
+[2026-06-29 22:27:05.896] [INFO] AdminCommandHandler initialized
+[2026-06-29 22:27:05.897] [INFO] ExtensionManager initialization completed.
+[2026-06-29 22:27:05.900] [INFO] UDP Broadcast Server started on port 9999

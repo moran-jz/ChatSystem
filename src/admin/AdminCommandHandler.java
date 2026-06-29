@@ -3,6 +3,9 @@ package admin;
 import server.ChatServer;
 import server.OnlineUserManager;
 
+import java.io.File;
+import java.nio.file.Files;
+import java.nio.file.Paths;
 import java.util.*;
 
 /**
@@ -12,7 +15,7 @@ public class AdminCommandHandler {
     private final ChatServer chatServer;
     private final Set<String> admins = new HashSet<>();
     private static final Set<String> KNOWN_COMMANDS = new HashSet<>(Arrays.asList(
-        "/help", "/tell", "/kick", "/ban", "/unban", "/list", "/broadcast", "/shutdown"
+        "/help", "/tell", "/download", "/kick", "/ban", "/unban", "/list", "/broadcast", "/shutdown"
     ));
 
     public AdminCommandHandler(ChatServer chatServer) {
@@ -32,6 +35,7 @@ public class AdminCommandHandler {
             return "不是有效命令。";
         }
 
+        
         String[] parts = fullMessage.split("\\s+", 2);
         String command = parts[0].toLowerCase();
         String arg = parts.length > 1 ? parts[1] : "";
@@ -41,12 +45,16 @@ public class AdminCommandHandler {
             return "未知命令，输入 /help 查看帮助。";
         }
 
-        // 2. /help 和 /tell 不需要管理员权限
+        // 2. /help、/tell、/download 不需要管理员权限
         if ("/help".equals(command)) {
             return getHelp();
         }
         if ("/tell".equals(command)) {
             return tell(sender, arg);
+        }
+        if ("/download".equals(command)) 
+        {
+            return download(sender, arg.trim());
         }
 
         // 3. 其他命令需要管理员权限
@@ -73,6 +81,23 @@ public class AdminCommandHandler {
     }
 
     // -------------------- 具体命令实现 --------------------//
+
+    // ★ 新增：/download 命令
+    private String download(String sender, String filename) 
+    {
+        if (filename.isEmpty()) return "用法: /download <文件名>";
+        File file = Paths.get("server_files", filename).toFile();
+        if (!file.exists()) return "文件不存在: " + filename;
+        try {
+            byte[] fileBytes = Files.readAllBytes(file.toPath());
+            String base64 = Base64.getEncoder().encodeToString(fileBytes);
+            String msg = "FILE_DOWNLOAD|" + filename + "|" + base64;
+            OnlineUserManager.sendToUser(sender, msg);
+            return "文件 " + filename + " 已开始下载。";
+        } catch (Exception e) {
+            return "下载失败: " + e.getMessage();
+        }
+    }
 
     private String tell(String sender, String arg) {
         if (arg.isEmpty()) {
@@ -141,12 +166,13 @@ public class AdminCommandHandler {
     private String getHelp() {
         return "可用命令:\n" +
                 "/tell <用户名> <消息> - 发送私聊消息\n" +
-                "/kick <用户名>  - 踢出用户\n" +
-                "/ban <用户名>   - 封禁用户\n" +
-                "/unban <用户名> - 解封用户\n" +
-                "/list          - 查看在线用户\n" +
-                "/broadcast <消息> - 发送系统广播\n" +
-                "/shutdown      - 关闭服务器\n" +
-                "/help          - 显示本帮助";
+                "/download <文件名>    - 获取已上传文件的下载链接\n" +
+                "/kick <用户名>       - 踢出用户\n" +
+                "/ban <用户名>        - 封禁用户\n" +
+                "/unban <用户名>      - 解封用户\n" +
+                "/list               - 查看在线用户\n" +
+                "/broadcast <消息>    - 发送系统广播\n" +
+                "/shutdown           - 关闭服务器\n" +
+                "/help               - 显示本帮助";
     }
 }
